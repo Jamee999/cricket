@@ -1,2 +1,1 @@
-web: cricket()
-stop
+web: run cricket.py

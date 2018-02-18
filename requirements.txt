@@ -4,6 +4,7 @@ chardet==3.0.4
 cycler==0.10.0
 dateparser==0.6.0
 flake8==3.5.0
+gunicorn
 idna==2.6
 matplotlib==2.1.2
 mccabe==0.6.1

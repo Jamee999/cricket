@@ -1,0 +1,9 @@
+.git
+.idea
+projectapp
+projectname
+rango
+db.sqlite3
+manage.py
+populate_rango.py
+requirements.txt

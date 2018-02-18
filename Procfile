@@ -1,1 +1,1 @@
-web: run cricket.py
+web: cricket.py

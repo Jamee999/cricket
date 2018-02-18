@@ -1,1 +1,1 @@
-web: pythom cricket.py
+web: gunicorn cricketonline:app --log-file -

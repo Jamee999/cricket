@@ -85,7 +85,7 @@ if LastYear < 1929 and FirstYear > 1913:
     FirstYear = 1913
     LastYear = 1920
 
-if LastYear < 1947 and FirstYear > 1939:
+if LastYear < 1947 and FirstYear > 1938:
     FirstYear = 1937
     LastYear = 1948
 
@@ -458,11 +458,11 @@ print ('')
 
 Team2Years = YearsInput (x)
 
-if LastYear < 1929 and FirstYear > 1913:
+if LastYear < 1919 and FirstYear > 1913:
     FirstYear = 1913
     LastYear = 1920
 
-if LastYear < 1947 and FirstYear > 1939:
+if LastYear < 1947 and FirstYear > 1938:
     FirstYear = 1938
     LastYear = 1948
     
@@ -845,26 +845,26 @@ def ball (x):
     Day = -(-(TotalOvers+OverCount)//90)
     if 'Spin' in Bowl1Role:
         if Day == 1:
-            det = 1.5
-        elif Day == 2:
             det = 1.4
+        elif Day == 2:
+            det = 1.3
         elif Day == 3:
             det = 1.1
         elif Day == 4:
-            det = 0.7
+            det = 0.8
         else:
-            det = 0.5
+            det = 0.6
     else:
         if Day == 1:
-            det = 1.2
-        if Day == 2:
             det = 1.1
+        if Day == 2:
+            det = 1.05
         if Day == 3:
             det = 1
         if Day == 4:
-            det = 0.9
+            det = 0.95
         if Day == 5:
-            det = 0.8
+            det = 0.9
 
 
     if ('Fast' in Bowl1Role or 'Med' in Bowl1Role) and (OverCount % 80) < 10:
@@ -876,7 +876,7 @@ def ball (x):
     else:
         BatAbi = Team1BatAbi[Position]
 
-    Form = 0.75 + min(0.15, (card[Position+1][2]/300)) + min(0.15,(card[Position+1][1]/100)) + min(0, ((200-card[Position+1][2])/1000))
+    Form = 0.8 + min(0.15, (card[Position+1][2]/500)) + min(0.15,(card[Position+1][1]/200)) + min(0, ((200-card[Position+1][2])/1000))
     if ((TotalOvers+OverCount) % 90) < 6:
         Form = min(Form, 0.8)
     
@@ -886,10 +886,12 @@ def ball (x):
     BowlER = Team2ERs[BowlPosition] * 2
     BowlAbi = Team2BowlAbi[BowlPosition] / BowlER
 
+    #print (BatAbi, BowlER, BowlAbi)
+
     if 'FakeWK' in Team2Roles:
-        AdjustedWkRt = 0.8 * BaseWkRt * (1/(BatAbi**0.8)) * (1/(BowlAbi)) * (1/(det**0.5)) * (1/Form**0.5) *AggFactor * (min(1, AggFactor))
+        AdjustedWkRt = 0.8 * BaseWkRt * (1/(BatAbi**0.8)) * (1/(BowlAbi)) * (1/(det**0.5)) * (1/Form**0.5) *AggFactor * (max(1, AggFactor))
     else:
-        AdjustedWkRt = BaseWkRt * (1/(BatAbi**0.8)) * (1/(BowlAbi)) * (1/(det**0.5)) * (1/Form**0.5) *AggFactor * (min(1, AggFactor))
+        AdjustedWkRt = BaseWkRt * (1/(BatAbi**0.8)) * (1/(BowlAbi)) * (1/(det**0.5)) * (1/Form**0.5) *AggFactor * (max(1, AggFactor))
     Adjusted6Rt = Base6Rt * (BatAbi**0.2) * BowlER * (det**0.5) * (Form**0.5) * AggFactor
     Adjusted4Rt = Base4Rt * (BatAbi**0.2) * BowlER * (det**0.5) * (Form**0.5) * AggFactor
     AdjustedScrRt = BaseScrRt * (BatAbi**0.2) * BowlER * (det**0.5) * (Form**0.5) * AggFactor
@@ -910,7 +912,7 @@ def ball (x):
         RunStats (4)
         return '4 runs!'
     
-    elif rand < (AdjustedWkRt + Adjusted6Rt + Adjusted4Rt + AdjustedScrRt):
+    elif rand < (AdjustedWkRt + Adjusted6Rt + Adjusted4Rt + (AdjustedScrRt)/1.3):
         a = random.random()
         if a > 0.25:
             RunsOver = RunsOver + 1
@@ -924,9 +926,8 @@ def ball (x):
             RunsOver = RunsOver + 3
             RunStats (3)
             return '3 runs.'
-    elif rand < (AdjustedWkRt + Adjusted6Rt + Adjusted4Rt + AdjustedScrRt + 0.025):
+    elif rand < (AdjustedWkRt + Adjusted6Rt + Adjusted4Rt + (AdjustedScrRt)/1.3 + 0.025):
         return 'Chance!'
-        # RUNS PER BALL IS TOO HIGH - added in 2s and 3s, but the prob is still calculated on the basis of BaseScrRt being all singles.
         
     else:
         return 'No run.'
@@ -1320,9 +1321,9 @@ def over (x):
             RemainingOvers = 1
         if (Target-Score)/RemainingOvers > 6 and RemainingOvers > 15:
             AggFactor = 0.7
-        if Wickets > 6 and Target-Score > 50:
+        if Wickets > 6 and Target-Score > 50 and RemainingOvers < 50:
             AggFactor = 0.7
-        if (Target-Score)/RemainingOvers < (10-Wickets) and RemainingOvers < 50:
+        if (Target-Score)/RemainingOvers < (10-Wickets) and RemainingOvers < 25:
             AggFactor = 1+(10-Wickets)/10
 
     while c < 6:

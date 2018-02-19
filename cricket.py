@@ -885,8 +885,11 @@ def ball (x):
     BowlPosition = Team2.index(Bowl1)
     BowlER = Team2ERs[BowlPosition] * 2
     BowlAbi = Team2BowlAbi[BowlPosition] / BowlER
-    
-    AdjustedWkRt = BaseWkRt * (1/(BatAbi**0.8)) * (1/(BowlAbi)) * (1/(det**0.5)) * (1/Form**0.5) *AggFactor * (min(1, AggFactor))
+
+    if 'FakeWK' in Team2Roles:
+        AdjustedWkRt = 0.8 * BaseWkRt * (1/(BatAbi**0.8)) * (1/(BowlAbi)) * (1/(det**0.5)) * (1/Form**0.5) *AggFactor * (min(1, AggFactor))
+    else:
+        AdjustedWkRt = BaseWkRt * (1/(BatAbi**0.8)) * (1/(BowlAbi)) * (1/(det**0.5)) * (1/Form**0.5) *AggFactor * (min(1, AggFactor))
     Adjusted6Rt = Base6Rt * (BatAbi**0.2) * BowlER * (det**0.5) * (Form**0.5) * AggFactor
     Adjusted4Rt = Base4Rt * (BatAbi**0.2) * BowlER * (det**0.5) * (Form**0.5) * AggFactor
     AdjustedScrRt = BaseScrRt * (BatAbi**0.2) * BowlER * (det**0.5) * (Form**0.5) * AggFactor
@@ -1146,10 +1149,11 @@ def Wicket (x,y):
     name = Team1.index(x) + 1
     card[name][3] = 1
     rand = random.random()
-    for i in range(0,11):
+    for i in range(0,12):
         if y == BowlCard[i][0]:
             PlayerNumber = i
             break
+    Role = Team2Roles[PlayerNumber]
     if rand < 0.2143:
         card[name][4] = str('b. ' + str(y))
         LastWicket[2] = str('b. ' + str(y))
@@ -1467,9 +1471,9 @@ def over (x):
         print(str(str(GameScores[4]) + ' ' + str(GameScores[5]) + '/' + str(GameScores[6]) + ' [' + str(GameScores[7]) +']' ))
         print(str(str(GameScores[8]) + ' ' + str(GameScores[9]) + '/' + str(GameScores[10]) + ' [' + str(GameScores[11]) +']' ))
         print(str(BatTeam)+' ' +str(Score)+'/' + str(Wickets)+ ' [' +str(OverCount) + ']')  
-        if (GameOvers-OverCount+1) < GameOvers and (Score+GameScores[5]) <= (GameScores[1]+GameScores[9]) and Wickets != 10 and FollowOn == False:
+        if (TotalOvers+OverCount) < GameOvers and (Score+GameScores[5]) <= (GameScores[1]+GameScores[9]) and Wickets != 10 and FollowOn == False:
             print(str(BatTeam)+ ' require ' + str((GameScores[1]+GameScores[9]-GameScores[5]-Score+1)) + ' more runs in ' +str((GameOvers-TotalOvers-OverCount)) + ' overs.')
-        if (GameOvers-OverCount+1) < GameOvers and (Score+GameScores[5]) <= (GameScores[1]+GameScores[9]) and Wickets != 10 and FollowOn == True:
+        if (TotalOvers+OverCount) < GameOvers and (Score+GameScores[5]) <= (GameScores[1]+GameScores[9]) and Wickets != 10 and FollowOn == True:
             print(str(BatTeam)+ ' require ' + str((GameScores[5]+GameScores[9]-GameScores[1]-Score+1)) + ' more runs in ' +str((GameOvers-TotalOvers-OverCount)) + ' overs.')
         
     print ('')
@@ -1519,9 +1523,12 @@ def innings (BatTeam):
     elif Innings == 2 and FollowOn == True:
         print (str(' '+Team1Name + ' - 2nd innings (following on)'))
         Results.write(str(' '+Team1Name + ' - 2nd innings (following on)'))
-    else:
+    elif Innings ==3 and FollowOn == False:
         print (str(' '+Team1Name + ' - 2nd innings (Target: ' + str(GameScores[1]+GameScores[9]-GameScores[5]+1) + ')'))
         Results.write(str(' '+Team1Name + ' - 2nd innings (Target: ' + str(GameScores[1]+GameScores[9]-GameScores[5]+1)) + ')')
+    elif Innings ==3 and FollowOn == True:
+        print (str(' '+Team1Name + ' - 2nd innings (Target: ' + str(GameScores[5]+GameScores[9]-GameScores[1]+1) + ')'))
+        Results.write(str(' '+Team1Name + ' - 2nd innings (Target: ' + str(GameScores[5]+GameScores[9]-GameScores[1]+1)) + ')')
     
     Results.write('\n')
     for i in a:
@@ -1568,7 +1575,7 @@ def innings (BatTeam):
 
     if Wickets > 0:
         for w in range (0,(len(FallOfWicket))):
-            #print (str(' ' + str(FallOfWicket[w]) + '-' + str(w+1) + ' '), end=''),
+            print (str(' ' + str(FallOfWicket[w]) + '-' + str(w+1) + ' '), end=''),
             Results.write(str(' ' + str(FallOfWicket[w]) + '-' + str(w+1) + ' '))
         print (' ')
         Results.write('\n')
@@ -1603,7 +1610,13 @@ def innings (BatTeam):
         for i in range (0, 22):
             if MOM[i][0] in Team2:
                 MOM[i][1] = MOM[i][1] + 100
-    elif Innings == 3 and (Score+GameScores[5]) > ((GameScores[1] + GameScores[9])):
+    elif Innings == 3 and (Score+GameScores[5]) > ((GameScores[1] + GameScores[9])) and FollowOn==False:
+        print (str(str(BatTeam) + ' wins by ' +str(10-Wickets) + ' wickets.'))
+        Results.write ((str(str(BatTeam) + ' wins by ' +str(10-Wickets) + ' wickets.')))
+        for i in range (0, 22):
+            if MOM[i][0] in Team1:
+                MOM[i][1] = MOM[i][1] + 100
+    elif Innings == 3 and (Score+GameScores[1]) > ((GameScores[5] + GameScores[9])) and FollowOn==True:
         print (str(str(BatTeam) + ' wins by ' +str(10-Wickets) + ' wickets.'))
         Results.write ((str(str(BatTeam) + ' wins by ' +str(10-Wickets) + ' wickets.')))
         for i in range (0, 22):
@@ -1746,9 +1759,9 @@ else:
     else:
         innings(BatTeam)
         if Score + GameScores[1] < GameScores[5]:
-            print (str( str(BatTeam) + ' wins by an innings and ' + str(GameScores[5]-(GameScores[1] + Score)) + ' runs.'))
+            print (str( str(BowlTeam) + ' wins by an innings and ' + str(GameScores[5]-(GameScores[1] + Score)) + ' runs.'))
             Results = open('scorecard.txt', 'a')
-            Results.write(str( str(BatTeam) + ' wins by an innings and ' + str((GameScores[5]-GameScores[1]-Score))    + ' runs.'))
+            Results.write(str( str(BowlTeam) + ' wins by an innings and ' + str((GameScores[5]-GameScores[1]-Score))    + ' runs.'))
             Results.close()
             WinningTeam=Team1
         else:
@@ -1779,3 +1792,5 @@ Results = open('scorecard.txt', 'a')
 Results.write('\n')
 Results.write( str ('Man of the Match: ' + str(ManOfMatch)))
 Results.close()
+
+print ('Results saved to scorecard.txt')

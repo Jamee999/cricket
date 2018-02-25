@@ -1,0 +1,86 @@
+[Example]
+[11 players]
+[11 batting averages]
+[11 bowling averages]
+[Captain]
+[Wicket-keeper]
+
+England
+JB Hobbs, L Hutton, WR Hammond, PBH May, KP Pietersen, DCS Compton, LEG Ames, IT Botham, JC Laker, FS Trueman, AV Bedser
+56.94, 56.67, 58.45, 46.67, 47.28, 50.06, 40.56, 33.54, 14.08, 13.81, 12.75
+100, 77.33, 37.8, 300, 88.6, 56.4, 500, 28.4, 21.24, 21.57, 24.89
+Bat, Bat, ARFast, Bat, PartSpin, PartSpin, WK, ARFast, Spin, Fast, Fast
+L Hutton
+LEG Ames
+
+Australia
+ML Hayden, WM Lawry, DG Bradman, RT Ponting, GS Chappell, AR Border, AC Gilchrist, AK Davidson, SK Warne, DK Lillee, GD McGrath
+50.73, 47.15, 99.94, 51.85, 53.86, 50.56, 47.6, 24.59, 17.32, 13.71, 7.36
+100, 100, 99.94, 70, 40.7, 39.1, 500, 20.53, 25.41, 23.92, 21.64
+Bat, Bat, Bat, Bat, PartSpin, PartSpin, WK, ARFast, Spin, Fast, Fast
+DG Bradman
+AC Gilchrist
+
+South Africa
+GC Smith, BA Richards, HM Amla, RG Pollock, JH Kallis, AB de Villiers, GA Faulkner, MV Boucher, SM Pollock, DW Steyn, AA Donald
+48.25, 50, 49.08, 60.97, 55.37, 49.92, 40.79, 30.30, 32.31, 14.19, 10.68
+100, 40, 100, 51, 32.65, 52, 26.58, 500, 23.11, 22.32, 22.25
+Bat, PartSpin, Bat, Bat, ARFast, Bat, ARSpin, WK, ARFast, Fast, Fast
+GC Smith
+MV Boucher
+
+West Indies
+CG Greenidge, CC Hunte, GA Headley, BC Lara, GS Sobers, IVA Richards, PJL Dujon, MD Marshall, MA Holding, J Garner, CEL Ambrose
+44.72, 45.06, 60.83, 52.88, 57.78, 50.23, 31.94, 18.85, 13.78, 12.44, 12.40
+200, 55, 60, 300, 34.03, 61.37, 500, 20.94, 23.68, 20.97, 20.99
+Bat, Bat, Bat, Bat, ARSpin, PartSpin, WK, Fast, Fast, Fast, Fast
+GS Sobers
+PJL Dujon
+
+New Zealand
+B Sutcliffe, GM Turner, MD Crowe, KS Williamson, SP Fleming, BB McCullum, CL Cairns, DL Vettori, RJ Hadlee, BR Taylor, SE Bond
+40.1, 44.64, 45.36, 50.62, 40.06, 38.64, 33.53, 30, 27.16, 20.40, 12.92
+86, 200, 48.28, 38.93, 500, 500, 29.4, 34.36, 22.29, 26.60, 25.09
+Bat, Bat, PartMed, PartSpin, Bat, WK, ARFast, ARSpin, ARFast, Fast, Fast
+SP Fleming
+BB McCullum
+
+India
+SM Gavaskar, V Sehwag, R Dravid, SR Tendulkar, V Kohli, VS Hazare, MS Dhoni, N Kapil Dev, R Ashwin, J Srinath, BS Bedi
+51.12, 49.34, 52.31, 53.78, 53.4, 47.65, 38.09, 31.05, 30.64, 14.21, 8.98
+206, 47.35, 70, 54.17, 110, 61, 500, 29.64, 25.56, 30.49, 28.71
+Bat, PartSpin, Bat, PartSpin, Bat, PartMed, WK, ARFast, ARSpin, Fast, Spin
+SM Gavaskar
+MS Dhoni
+
+Pakistan
+Saeed Anwar, Hanif Mohammad, Inzamam-ul-Haq, Javed Miandad, Mohammad Yousuf, Younis Khan, Imran Khan, Imtiaz Ahmed, Wasim Akram, Saqlain Mushtaq, Waqar Younis
+45.52, 43.98, 49.6, 52.57, 52.29, 52.05, 37.69, 29.28, 22.64, 14.48, 10.20
+100, 95, 70, 40.11, 400, 54.55, 22.81, 500, 23.62, 29.83, 23.56
+Bat, Bat, Bat, PartSpin, Bat, Bat, ARFast, WK, ARFast, Spin, Fast
+Imran Khan
+Imtiaz Ahmed
+
+Rest of the World
+G Boycott, DL Haynes, KC Sangakkara, A Flower, DPMD Jayawardene, VVS Laxman, Shakib Al Hasan, KR Miller, PM Pollock, Fazal Mahmood, M Muralitharan
+47.72, 42.29, 57.40, 51.54, 49.84, 45.97, 40.38, 36.97, 21.67, 14.09 , 11.67
+54.47, 100, 400, 500, 51.66, 200, 32.37, 22.97, 24.18, 24.70, 22.72
+PartSpin, Bat, WK, WK, PartMed, Bat, ARSpin, ARFast, ARFast, Fast, Spin
+DPMD Jayawardene
+A Flower
+
+Australia A
+WH Ponsford, RB Simpson, SPD Smith, SR Waugh, RN Harvey, MJ Clarke, KR Miller, IA Healy, RR Lindwall, FR Spofforth, WJ O Reilly
+48.22, 46.81, 63.75, 51.06, 48.41, 49.10, 36.67, 27.39, 21.15, 14.43, 12.81
+400, 42.26, 54.35, 37.44, 100, 38.19, 22.97, 500, 23.03, 23.41, 22.59
+Bat, PartSpin, PartSpin, PartMed, Bat, PartSpin, ARFast, WK, Fast, Fast, Spin
+SR Waugh
+IA Healy
+
+England A
+GA Gooch, G Boycott, H Sutcliffe, KF Barrington, ER Dexter, DI Gower, AW Greig, APE Knott, H Verity, RGD Willis, JB Statham
+42.58, 47.72, 60.73, 58.67, 47.89, 44.25, 40.43, 32.75, 20.90, 11.50, 11.44
+46.47, 54.47, 400, 44.82, 34.93, 200, 32.20, 500, 24.37, 25.20, 24.84
+PartMed, PartSpin, Bat, PartSpin, PartMed, Bat, ARMed, WK, Spin, Fast, Fast
+ER Dexter
+APE Knott

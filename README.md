@@ -1,4 +1,10 @@
 # cricket
 Test match cricket simulator
 Python program takes user inputs for years and teams and simulates a Test match, then outputs a scorecard.txt file.
-It has only been built and tested to run in IDLE. While the program can be run in terminal, it is not very stable, and often crashes or doesn't work.
+
+How to run:
+download all the files in the /cricket branch.
+direct your command line to the folder where the files were downloaded
+type python3 cricket.py
+
+if this doesn't work, you may need to download python from https://www.python.org/

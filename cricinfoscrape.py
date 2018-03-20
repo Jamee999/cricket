@@ -1,8 +1,8 @@
 # THIS FILE SCRAPES DATA FROM CRICINFO, TURNS IT INTO READABLE DATA, AND EXPORTS IT TO PLAYERS.TXT
 
-a = 500 #Number of players to read, starting with Cap 1 for the country
-b = 4 # Cricinfo Team ID: 1 = England, 2 = Australia, 3 = South Africa, 4 = West Indies, 5 = New Zealand, 6 = India, 7 = Pakistan, 8 = Sri Lanka, 9 = Zimbabwe, 25 = Bangladesh
-c = 'westindiesplayers.txt' #file to write to
+a = 700 #Number of players to read, starting with Cap 1 for the country (doesn't need to be exact, program will end with an error but still execute)
+b = 25 # Cricinfo Team ID: 1 = England, 2 = Australia, 3 = South Africa, 4 = West Indies, 5 = New Zealand, 6 = India, 7 = Pakistan, 8 = Sri Lanka, 9 = Zimbabwe, 25 = Bangladesh
+c = 'bangladeshplayers.txt' #file to write to
 
 from bs4 import BeautifulSoup
 import requests
@@ -248,56 +248,63 @@ def guruscrape (x):
     soup = BeautifulSoup(player, 'html.parser')
 
     try:
-        CaptainGames = soup.find(text='is captain')
-        print (CaptainGames.parent.parent.parent.contents[5])
-        if 'Span' in soup.prettify():
-            CaptainGames = CaptainGames.parent.parent.parent.contents[5]
-        else:
-            CaptainGames = CaptainGames.parent.parent.parent.contents[4]
-        CaptainGames = str(CaptainGames)
-        CaptainGames = CaptainGames[4:-5]
-        print (CaptainGames)
-        ReducedStats.append(int(CaptainGames))
+        CaptainGames = ''
+        while CaptainGames == '':
+            CaptainGames = soup.find(text='is captain')
+            if 'Span' in soup.prettify():
+                CaptainGames = CaptainGames.parent.parent.parent.contents[5]
+            else:
+                CaptainGames = CaptainGames.parent.parent.parent.contents[4]
+            CaptainGames = str(CaptainGames)
+            CaptainGames = CaptainGames[4:-5]
+            ReducedStats.append(int(CaptainGames))
     except:
         ReducedStats.append(0)
 
     try:
-        WKGames = soup.find(text='is designated keeper')
-        if 'Span' in soup.prettify():
-            WKGames = WKGames.parent.parent.next_sibling.next_sibling.next_sibling.next_sibling
-        else:
-            WKGames = WKGames.parent.parent.parent.next_sibling.next_sibling
-        WKGames = str(WKGames)
-        WKGames = WKGames[4:-5]
-        ReducedStats.append(int(WKGames))
+        WKGames = ''
+        while WKGames == '':
+            WKGames = soup.find(text='is designated keeper')
+            if 'Span' in soup.prettify():
+                WKGames = WKGames.parent.parent.parent.contents[5]
+            else:
+                WKGames = WKGames.parent.parent.parent.contents[3]
+            WKGames = str(WKGames)
+            WKGames = WKGames[4:-5]
+            ReducedStats.append(int(WKGames))
     except:
         ReducedStats.append(0)
     try:
-        Bat1Inns = soup.find(text='1st position')
-        if 'Span' in soup.prettify():
-            Bat1Inns = Bat1Inns.parent.parent.parent.contents[7]
-        else:
-            Bat1Inns = Bat1Inns.parent.parent.parent.contents[5]
-        #print (Bat1Inns.parent.parent.parent.contents)
-        Bat1Inns = str(Bat1Inns)
-        Bat1Inns = Bat1Inns[4:-5]
-        Bat1Inns = int(Bat1Inns)
+        Bat1Inns = ''
+        while Bat1Inns == '':
+            Bat1Inns = soup.find(text='1st position')
+            if 'Span' in soup.prettify():
+                Bat1Inns = Bat1Inns.parent.parent.parent.contents[7]
+            else:
+                Bat1Inns = Bat1Inns.parent.parent.parent.contents[5]
+            #print (Bat1Inns.parent.parent.parent.contents)
+            Bat1Inns = str(Bat1Inns)
+            Bat1Inns = Bat1Inns[4:-5]
+            Bat1Inns = int(Bat1Inns)
     except:
         Bat1Inns = 0
     try:
-        Bat2Inns = soup.find(text='2nd position')
-        if 'Span' in soup.prettify():
-            Bat2Inns = Bat2Inns.parent.parent.parent.contents[7]
-        else:
-            Bat2Inns = Bat2Inns.parent.parent.parent.contents[5]
-        #print (Bat2Inns)
-        Bat2Inns = str(Bat2Inns)
-        Bat2Inns = Bat2Inns[4:-5]
-        Bat2Inns = int(Bat2Inns)
+        Bat2Inns = ''
+        while Bat2Inns == '':
+            
+            Bat2Inns = soup.find(text='2nd position')
+            if 'Span' in soup.prettify():
+                Bat2Inns = Bat2Inns.parent.parent.parent.contents[7]
+            else:
+                Bat2Inns = Bat2Inns.parent.parent.parent.contents[5]
+            #print (Bat2Inns)
+            Bat2Inns = str(Bat2Inns)
+            Bat2Inns = Bat2Inns[4:-5]
+            Bat2Inns = int(Bat2Inns)
     except:
         Bat2Inns = 0
     OpenInns = Bat1Inns + Bat2Inns
-    #print (Bat1Inns, Bat2Inns)
+    print (CaptainGames, WKGames, OpenInns)
     ReducedStats.append(OpenInns)
         
         
@@ -312,7 +319,7 @@ def PlayerList (x, y):
     f.write(str(Format))
     f.write('\n')
     f.close()   
-    
+    f = open(c,'w')
     for i in range (1, (x+1)):
         ReducedStats = []
         HTMLString = newsoup.find(text=i)
@@ -327,10 +334,9 @@ def PlayerList (x, y):
         scrape (PlayerNo)
         guruscrape (PlayerNo)
         print (ReducedStats)
-        f = open(c,'a')
         f.write(str(ReducedStats))
         f.write('\n')
-        f.close()
+    f.close()
         
 
 #print ('[Name, BowlStyle, Games, Inns, NO, RunsSc, Balls, RunsAg, Wic, FirstTest, LastTest, FCGames, FCRuns, FCBatAve, FCInns, FCWickets, FCBowlAve]')

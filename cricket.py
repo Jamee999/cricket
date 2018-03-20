@@ -21,12 +21,14 @@ GameOvers = 450 #maximum number of overs in the game
 
 def CustomOrHistorical (x):
     y = ''
-    while y != 'h' and y!= 'c': #loops until given acceptable input
-        y = str(input(str("Type 'h' for historical teams, or 'c' for custom teams. " )))
+    while y != 'h' and y!= 'c' and y != 'r': #loops until given acceptable input
+        y = str(input(str("Type 'h' for historical teams, 'c' for custom teams, or 'r' to recreate a real test match. " )))
         if y == 'h':
             return 'historical'
         if y == 'c':
             return 'custom'
+        if y == 'r':
+            return 'recreate'
         else:
             print ('Invalid input. ')
 
@@ -291,10 +293,178 @@ def CallPlayers (a, x, y):
             Players.append(PlayersTemp[i])
     return Players
 
+def RecreateSelect (x): #module that runs to select recreated tests
+    y = 0
+    while (1877 > y or y > 2018) and y!= 'all': #loop until given a valid year
+        try:
+            y = input('Which year did your test match take place in? ')
+            if y == 'random':
+                y = random.choice(1877, 2018)
+                y = int(y)
+                break
+            if y == 'all':
+                break
+            y = int(y)
+        except:
+            print ('Invalid input.')
+
+    Tests = []
+
+    f = open('testmatchlist.txt','r') #read testmatchlist.txt
+    for line in f:
+        if str(y) in line or y == 'all':
+            Tests.append(line[1:-2])
+    f.close()
+
+    ValidTests = []
+
+    for i in range(0, len(Tests)): #get rid of apostraphes
+        Tests[i] = Tests[i].replace("St John's", "'St Johns'")
+        Tests[i] = Tests[i].replace("Lord's", "'Lords'")
+        Tests[i] = Tests[i].replace("St George's", "'St Georges'")
+        Tests[i] = Tests[i].split("'")
+        Tests[i][0] = int(Tests[i][0][:-2]) #correctly format
+        if y == 'all':
+            for j in range (2, 7):
+                Tests[i].pop(j)
+            Tests[i][9] = int(Tests[i][9][2:])
+            ValidTests.append(Tests[i])
+            continue
+        if Tests[i][0] != y:
+            continue
+        for j in range (2, 7):
+            Tests[i].pop(j)
+        Tests[i][9] = int(Tests[i][9][2:])
+        ValidTests.append(Tests[i])
+
+    print ('List of test matches in {}:'.format(y)) #print tests that took place in selected year
+    for i in range (0, len(ValidTests)):
+        formatted = '{} - {} vs. {}, {}, {}'.format(ValidTests[i][4],ValidTests[i][1],ValidTests[i][2],ValidTests[i][3],ValidTests[i][8])
+        print (formatted)
+
+    n = 0
+    while n == 0: #loops until given a valid test
+        try:
+            z = int(input('Enter the number of the Test match you wish to simulate. '))
+        except:
+            print ('Invalid input.')
+        for i in range (0, len(ValidTests)):
+            if 'Test # {}'.format(z) == ValidTests[i][4]:
+                q = i
+                n = ValidTests[i][9] #cricinfo scorecard ID
+                print ('Loading. ')
+                break
+
+    from bs4 import BeautifulSoup
+    import requests
+    import re
+    url = 'http://www.espncricinfo.com/ci/engine/match/{}.html'.format(n) #url for selected game
+
+    def Lineup(x): #finds the lineup 
+        r = requests.get(url)
+        data = r.content
+        soup = BeautifulSoup(data, 'html.parser')
+        players = []
+        findtext = '{} 1st Innings'.format(x) #finds the team's first batsmen
+        player = soup.find(text = findtext).parent.parent.parent.next_sibling.contents[0].contents[0].contents[1].contents[0].contents[0].contents[0]
+        players.append(player)
+        n = 1
+        for i in range (1,11): #find the next ten players
+            try:
+                player = soup.find(text = findtext).parent.parent.parent.next_sibling.contents[0].contents[i].contents[0].contents[0].contents[0].contents[0]
+                if '<' not in player and 'Fall of wickets' not in player and 'Did not bat' not in player:
+                    players.append(player)
+                    n = n+1
+            except:
+                n = n
+        c = 1
+        while n < 11:
+            player = soup.find(text='Did not bat').parent.parent.parent.contents[c].contents[0].contents[0]
+            player = player.replace(', ','')
+            if 'Did not bat' not in player:
+                players.append(player)
+                n = n+1
+                c = c+1
+        #print (players)
+        return players
+
+    def ReadPlayers (x, y): #find the players in the relevant data file
+        global PlayersTemp
+        PlayersTemp = []
+        Players = []
+        if y == 'ICC World XI':
+            y = 'all'
+        country = ''.join(y.split()).lower() #removes spaces
+        with open(str(str(country) + 'data.txt')) as f:
+            for line in f:
+                PlayersTemp.append(line[0:-1])
+        DataValidation (len(PlayersTemp)) #converts data
+        for i in range (0, 11):
+            for j in range (0, len(PlayersTemp)):
+                if PlayersTemp[j][0] == x[i]:
+                    Players.append(PlayersTemp[j])
+                    #print (PlayersTemp[j])
+                    break
+        return Players
+
+    print ('')
+    print (str(ValidTests[q][1]))
+    print ('')    
+    HomeTeam = Lineup (ValidTests[q][1])
+    for i in range (0, 11):
+        print (HomeTeam[i])
+        #time.sleep(0.8)
+        if ' (c)' in HomeTeam[i] and ' †' in HomeTeam[i]:
+            HomeTeam[i] = HomeTeam[i].replace(' (c)','')
+            HomeTeam[i] = HomeTeam[i].replace(' †','')
+            HomeCapt = HomeTeam[i]
+            HomeWK = HomeTeam[i]
+        if ' (c)' in HomeTeam[i]:
+            HomeTeam[i] = HomeTeam[i].replace(' (c)','')
+            HomeCapt = HomeTeam[i]
+        if ' †' in HomeTeam[i]:
+            HomeTeam[i] = HomeTeam[i].replace(' †','')
+            HomeWK = HomeTeam[i]
+        if 'jnr' in HomeTeam[i]:
+            HomeTeam[i] = HomeTeam[i].replace('jnr', ' jnr')
+        if 'snr' in HomeTeam[i]:
+            HomeTeam[i] = HomeTeam[i].replace('snr', ' snr')
+    HomeTeamData = ReadPlayers (HomeTeam, ValidTests[q][1])
+    print ('')
+    print (str(ValidTests[q][2]))
+    print ('')    
+    AwayTeam = Lineup (ValidTests[q][2])
+    for i in range (0, 11):
+        print (AwayTeam[i])
+ #       time.sleep (0.8)
+        if ' (c)' in AwayTeam[i] and ' †' in AwayTeam[i]:
+            AwayTeam[i] = AwayTeam[i].replace(' (c)','')
+            AwayTeam[i] = AwayTeam[i].replace(' †','')
+            AwayCapt = AwayTeam[i]
+            AwayWK = AwayTeam[i]
+        if ' (c)' in AwayTeam[i]:
+            AwayTeam[i] = AwayTeam[i].replace(' (c)','')
+            AwayCapt = AwayTeam[i]
+        if ' †' in AwayTeam[i]:
+            AwayTeam[i] = AwayTeam[i].replace(' †','')
+            AwayWK = AwayTeam[i]
+        if 'jnr' in AwayTeam[i]:
+            AwayTeam[i] = AwayTeam[i].replace('jnr', ' jnr')
+            continue
+        if 'snr' in AwayTeam[i]:
+            AwayTeam[i] = AwayTeam[i].replace('snr', ' snr')
+    AwayTeamData = ReadPlayers (AwayTeam, ValidTests[q][2])
+    #print (HomeTeamData, AwayTeamData)
+
+    return [ValidTests[q][1], HomeTeamData, HomeCapt, HomeWK, ValidTests[q][2], AwayTeamData, AwayCapt, AwayWK, y]
+
+
+
+
 
 def Choice (x):
     global TeamName, FirstYear, LastYear
-    mode = CustomOrHistorical (x) #returns either 'historical' or 'custom'
+    mode = CustomOrHistorical (x) #returns either 'historical'. 'custom' or recreate
     if mode == 'historical':
         Years = HistoricalYearsSelect (x)
         Range = Years.split('-')
@@ -309,6 +479,10 @@ def Choice (x):
         LastYear = 2018
         Players = CustomSelect (x)
         return Players
+
+    elif mode == 'recreate':
+        return 'recreate'
+        
 
 
 
@@ -333,7 +507,6 @@ def Select (Players):
     global BowlCount, SpinCount, customteamsave, PaceFactor, SpinFactor
     import random
     from operator import itemgetter
-    #print (Players)
     SelectedTeam = []
 
     OpenCount = 0 #these variables track the various types of players in the team
@@ -414,16 +587,21 @@ def Select (Players):
             Players.remove(Keepers[0])
         else:
             Players.sort(key = lambda x: x[1] + 15*(random.random() - random.random()), reverse = True)
-            Players[0][3] = Players[0][3] + 'FakeWK' #if there's no keepers in the pool, pick a non-WK, label with FakeWK
+            #Players[0][3] = Players[0][3] + 'FakeWK' #if there's no keepers in the pool, pick a non-WK, label with FakeWK
             SelectedTeam.append(Players[0])
-            WKName = Players[0][0]
+            WKName = 'WK NEEDED!!!'
             Players.remove(Players[0])
 
     PaceCount = 0
 
     for i in range (0, len(SelectedTeam)): #count the number of bowlers, pacers, spinners in the team
-        if 'Bat' not in SelectedTeam[i][3] and 'WK' not in SelectedTeam[i][3] and 'Part' not in SelectedTeam[i][3] and SelectedTeam[i][1] < 30:
-            BowlCount = BowlCount+1
+        if 'Bat' not in SelectedTeam[i][3] and 'WK' not in SelectedTeam[i][3] and 'Part' not in SelectedTeam[i][3]:
+            if SelectedTeam[i][1] < 30:
+                BowlCount = BowlCount+1
+            elif SelectedTeam[i][1] < 40:
+                BowlCount = BowlCount + 0.5
+            else:
+                BowlCount = BowlCount + (1/4)
         if 'Spin' in SelectedTeam[i][3] and 'Part' not in SelectedTeam[i][3]:
             SpinCount = SpinCount + 1
         if ('Fast' in SelectedTeam[i][3] or 'Med' in SelectedTeam[i][3]) and 'Part' not in SelectedTeam[i][3]:
@@ -435,33 +613,45 @@ def Select (Players):
             return x[1]/(PaceFactor*SpinFactor) + 5*(random.random()-random.random())
         elif 'Part' in x[3]:
             if PaceCount < 2 and 'Spin' not in x[3]: #batting average + 50-BowlAv
-                return (x[1]/(PaceFactor*SpinFactor) + (max(0, (50-x[2]))))  + 5*(random.random()-random.random())
+                return (x[1]/(PaceFactor*SpinFactor) + (max(0, (50-x[2]))))/2  + 5*(random.random()-random.random())
             else:
-                return (x[1]/(PaceFactor*SpinFactor) + (max(0, (50-x[2]))))  + 5*(random.random()-random.random())
+                return (x[1]/(PaceFactor*SpinFactor) + (max(0, (50-x[2]))))/2  + 5*(random.random()-random.random())
 
         else:
             if 'Spin' in x[3] and 'Part' not in x[3]: #the value of bowling average is modified by the makeup of the rest of the side and the pitch conditions
                 if SpinCount > 0:
-                    return (x[1]/(PaceFactor*SpinFactor) + (max(0, (45-x[2])*(PaceFactor/SpinFactor)) * (45/BowlCount**3)) + 5*(random.random()-random.random()))
+                    return (x[1]/(PaceFactor*SpinFactor) + (max(0, (45-x[2])*(PaceFactor/SpinFactor)) * (250/BowlCount**4)) + 5*(random.random()-random.random()))
                 else:
-                    return (x[1]/(PaceFactor*SpinFactor) + (max(0, (45-x[2])*(PaceFactor/SpinFactor)) * (120/BowlCount**3)) + 5*(random.random()-random.random())) 
+                    return (x[1]/(PaceFactor*SpinFactor) + (max(0, (50-x[2])*(PaceFactor/SpinFactor)) * (500/BowlCount**4)) + 5*(random.random()-random.random())) 
             else:
                 if PaceCount <2:
-                    return (x[1]/(PaceFactor*SpinFactor) + (max(0, (50-x[2])*(SpinFactor/PaceFactor)) * (90/BowlCount**3))  + 5*(random.random()-random.random()))
+                    return (x[1]/(PaceFactor*SpinFactor) + (max(0, (50-x[2])*(SpinFactor/PaceFactor)) * (250/BowlCount**4))  + 5*(random.random()-random.random()))
                 else:
-                    return (x[1]/(PaceFactor*SpinFactor) + (max(0, (45-x[2])*(SpinFactor/PaceFactor)) * (90/BowlCount**3))  + 5*(random.random()-random.random()))
+                    return (x[1]/(PaceFactor*SpinFactor) + (max(0, (45-x[2])*(SpinFactor/PaceFactor)) * (250/BowlCount**4))  + 5*(random.random()-random.random()))
 
     n = len(SelectedTeam)
     for i in range (n, 11): #fill the team up to 11 players
         Players.sort(key = lambda x: Value (x), reverse = True) #resort by the adjusted value function after each player is selected
         SelectedTeam.append(Players[0]) #add the players
         Players.pop(0)
-        if 'Bat' not in SelectedTeam[i][3] and 'WK' not in SelectedTeam[i][3] and 'Part' not in SelectedTeam[i][3] and SelectedTeam[i][1] < 30:
-            BowlCount = BowlCount+1
+        if 'Bat' not in SelectedTeam[i][3] and 'WK' not in SelectedTeam[i][3] and 'Part' not in SelectedTeam[i][3]:
+            if SelectedTeam[i][1] < 30:
+                BowlCount = BowlCount+1
+            elif SelectedTeam[i][1] < 40:
+                BowlCount = BowlCount + 0.5
+            else:
+                BowlCount = BowlCount + (1/4)
         if 'Spin' in SelectedTeam[i][3] and 'Part' not in SelectedTeam[i][3]:
             SpinCount = SpinCount + 1
         if 'Fast' in SelectedTeam[i][3] or 'Med' in SelectedTeam[i][3]:
             PaceCount = PaceCount + 1
+
+    if WKName == 'WK NEEDED!!!':
+        for i in range (10):
+            SelectedTeam.sort(key = lambda x: x[2], reverse = True)
+            WKName = SelectedTeam[0][0]
+            SelectedTeam[0][3] = SelectedTeam[0][3] + 'FakeWK'
+            
 
     def Order (y): #putting the selected players in batting order
         Lineup = []
@@ -471,13 +661,13 @@ def Select (Players):
         for i in q:
             if 'Open' in i[3]:
                 i.append(1) #adds value for openers
+            if 'FillIn' in i[3]:
+                i.append(0.7)
             if 'WK' in i[3]:
                 try:
                     i[9] = i[9] - 0.5 #reduces the value for keeper-openers
                 except:
                     i.append(0)
-            if 'FillIn' in i[3]:
-                i.append(0.7)
             if  'Open' not in i[3] and 'WK' not in i[3] and 'FillIn' not in i[3]:
                 i.append(0)
 
@@ -504,7 +694,7 @@ def Select (Players):
             Lineup.append(q[i])
         for j in range (0,11): #add the remaining players to the order
             print (Lineup[j][0])
-            time.sleep (0.8)
+ #           time.sleep (0.8)
             Lineup[j].pop()
         return (Lineup)
 
@@ -520,6 +710,7 @@ def DataConvert (x):
     Roles = []
     ERs = []
     for i in range (0, len(x)): #turns the player-by-player data into category-by-category
+        #print (x[i])
         Names.append(x[i][0])
         BatAvs.append(x[i][1])
         BowlAvs.append(x[i][2])
@@ -536,106 +727,135 @@ def CaptainSelect(x):
 
 # THE FUNCTIONS ABOVE ARE CALLED IN THIS SECTION
 
-PaceFactor = 0.75 + 0.25*random.random() + 0.25*random.random() #how good the pitch is for pace. 0.75-1.25, lower is better for bowling
+PaceFactor = 1 + (0.3*random.random()) * (random.random()-random.random()) #how good the pitch is for pace. 0.75-1.25, lower is better for bowling
 #PaceFactor = 1.1
-SpinFactor = 0.75 + 0.25*random.random() + 0.25*random.random() #same for spin
+SpinFactor = 1 + (0.3*random.random()) * (random.random()-random.random()) #same for spin
 #SpinFactor = 0.75
 
 print ('')
 
-#print (PaceFactor, SpinFactor)
 
-if PaceFactor < 0.9 and SpinFactor < 0.9: #prints a report based on the pitch
-    if PaceFactor*SpinFactor > 0.7:
-        print ('Pitch report: good for bowling.')
+def PitchReport(PaceFactor, SpinFactor):
+    if PaceFactor < 0.9 and SpinFactor < 0.9: #prints a report based on the pitch
+        if PaceFactor*SpinFactor > 0.7:
+            print ('Pitch report: good for bowling.')
+        else:
+            print ('Pitch report: GREAT for bowling.')
+    elif PaceFactor < 0.9 and SpinFactor > 0.9:
+        if PaceFactor > 0.8:
+            print ('Pitch report: Good for seam bowlers.')
+        else:
+            print ('Pitch report: GREAT for seam bowlers!')
+    elif PaceFactor >0.9 and SpinFactor <0.9:
+        if SpinFactor > 0.8:
+            print ('Pitch report: Good for spinners.')
+        else:
+            print ('Pitch report: GREAT for spinners.')
+    elif PaceFactor*SpinFactor < 1.1:
+        print ('Pitch report: even battle between bat and ball.')
+    elif PaceFactor*SpinFactor < 1.3:
+        print ('Pitch report: good for batting.')
     else:
-        print ('Pitch report: GREAT for bowling.')
-elif PaceFactor < 0.9 and SpinFactor > 0.9:
-    if PaceFactor > 0.8:
-        print ('Pitch report: Good for seam bowlers.')
-    else:
-        print ('Pitch report: GREAT for seam bowlers!')
-elif PaceFactor >0.9 and SpinFactor <0.9:
-    if SpinFactor > 0.8:
-        print ('Pitch report: Good for spinners.')
-    else:
-        print ('Pitch report: GREAT for spinners.')
-elif PaceFactor*SpinFactor < 1.1:
-    print ('Pitch report: even battle between bat and ball.')
-elif PaceFactor*SpinFactor < 1.3:
-    print ('Pitch report: good for batting.')
-else:
-    print ('Pich report: looks like a road! GREAT for batting.')
-
-print ('')
-print ('Team One')
-print ('')
+        print ('Pich report: looks like a road! GREAT for batting.')
 
 
 Team1Name = ''
 Team1Years = ''
-
 x = 0
-while x < 1:
-    Players = Choice (x)
-    try: #if the selected team fails, add one year on either end and try again
-        SelectedTeam = Select (Players)
-        x = 1
-    except:
-        print ('That combination of year and team is not possible.')
-        print ('')
-t = DataConvert (SelectedTeam)
-x = 0
+print ('')
+print ('Home Team')
+print ('')
+    
+Players = Choice (x)
 
-Team1Name = TeamName #putting the data into the right format
-Team1 = t[0]
-Team1BatAvs = t[1]
-Team1BowlAvs = t[2]
-Team1Roles = t[3]
-Team1ERs = t[4]
-Team1Captain = CaptainSelect (SelectedTeam)
-for i in range (0, 11): #selecting the lowest-batting WK to be the keeper
-    if 'WK' in t[3][i]:
-        Team1WK = t[0][i]
-    if t[4][i] == 0: #fixing 0 ERs
-        t[4][i] == 0.7
+if Players != 'recreate':
+    x = 0
+    while x < 1:
+        try: #if the selected team fails, ask again
+            SelectedTeam = Select (Players)
+            x = 1
+        except:
+            print ('That combination of year and team is not possible.')
+            print ('')
+            Players = Choice (x)
+    t = DataConvert (SelectedTeam)
+    x = 0
+
+    Team1Name = TeamName #putting the data into the right format
+    Team1 = t[0]
+    Team1BatAvs = t[1]
+    Team1BowlAvs = t[2]
+    Team1Roles = t[3]
+    Team1ERs = t[4]
+    Team1Captain = CaptainSelect (SelectedTeam)
+    for i in range (0, 11): #selecting the lowest-batting WK to be the keeper
+        if 'WK' in t[3][i]:
+            Team1WK = t[0][i]
+        if t[4][i] == 0: #fixing 0 ERs
+            t[4][i] == 0.7
 
 
-if FirstYear != LastYear: #setting up the years for the scorecard
-    Team1Years = (str(FirstYear)) + ' - ' + str(LastYear)
+    if FirstYear != LastYear: #setting up the years for the scorecard
+        Team1Years = (str(FirstYear)) + ' - ' + str(LastYear)
+    else:
+        Team1Years = (str(LastYear))
+
+    print ('')
+
+    print ('Away Team')
+    print ('')
+
+    x = 0
+    while x < 1: #duplicates the process for Team Two
+        Players = Choice (x)
+        try: #if the selected team fails, add one year on either end and try again
+            SelectedTeam = Select (Players)
+            x = 1
+        except:
+            print ('That combination of year and team is not possible.')
+    t = DataConvert (SelectedTeam)
+    x = 0
+
+    Team2Name = TeamName
+    Team2 = t[0]
+    Team2BatAvs = t[1]
+    Team2BowlAvs = t[2]
+    Team2Roles = t[3]
+    Team2ERs = t[4]
+    Team2Captain = CaptainSelect (SelectedTeam)
+    for i in range (0, 11):
+        if 'WK' in t[3][i]:
+            Team2WK = t[0][i]
+        if t[4][i] == 0: #fixing 0 ERs
+            t[4][i] == 0.7
+
 else:
-    Team1Years = (str(LastYear))
-
-print ('')
-
-print ('Team Two')
-print ('')
-
-x = 0
-while x < 1: #duplicates the process for Team Two
-    Players = Choice (x)
-    try: #if the selected team fails, add one year on either end and try again
-        SelectedTeam = Select (Players)
-        x = 1
-    except:
-        print ('That combination of year and team is not possible.')
-t = DataConvert (SelectedTeam)
-x = 0
-
-Team2Name = TeamName
-Team2 = t[0]
-Team2BatAvs = t[1]
-Team2BowlAvs = t[2]
-Team2Roles = t[3]
-Team2ERs = t[4]
-Team2Captain = CaptainSelect (SelectedTeam)
-for i in range (0, 11):
-    if 'WK' in t[3][i]:
-        Team2WK = t[0][i]
-    if t[4][i] == 0: #fixing 0 ERs
-        t[4][i] == 0.7
-
-
+    RealTest = RecreateSelect (x)
+    #print (RealTest)
+    #(ValidTests[q][1], HomeTeamData, HomeCapt, HomeWK, ValidTests[q][2], AwayTeamData, AwayCapt, AwayWK, Year)
+    Team1Name = RealTest[0]
+    #RealLineup = Select (RealTest[1])
+    a = DataConvert(RealTest[1])
+    Team1 = a[0]
+    Team1BatAvs = a[1]
+    Team1BowlAvs = a[2]
+    Team1Roles = a[3]
+    Team1ERs = a[4]
+    Team1Captain = RealTest[2].replace(' (c)','')
+    Team1WK = RealTest[3]
+    Team1Years = str(RealTest[8])
+    Team2Name = RealTest[4]
+    #RealLineup = Select (RealTest[5])
+    b = DataConvert(RealTest[5])
+    Team2 = b[0]
+    Team2BatAvs = b[1]
+    Team2BowlAvs = b[2]
+    Team2Roles = b[3]
+    Team2ERs = b[4]
+    Team2Captain = RealTest[6]
+    Team2WK = RealTest[7]
+    FirstYear = RealTest[8]
+    LastYear = RealTest[8]
 
 Team1BatAbi = []
 Team1BowlAbi = []
@@ -658,6 +878,8 @@ if Team1Name == Team2Name:
     Team1Name = str(str(Team1Name) + ' ' + str(Team1Years))
     Team2Name = str(str(Team2Name) + ' ' + str(Team2Years))
 
+print('')
+PitchReport (PaceFactor, SpinFactor)
 
 PaceFactor = PaceFactor**0.5 #square root applied to both runs/ball and wickets/ball combines to make the average a multiple of the factor
 SpinFactor = SpinFactor**0.5
@@ -933,7 +1155,7 @@ def ball (x): #function for each ball
 
     #works out the batsman's form - i.e. how set he is at the crease - as a function of runs scored and balls faced. max is 1.1, min is 0.9
     #last variable is a penalty for having played very long innings for tiredness
-    Form = 0.9 + min(0.10, (card[Position+1][2]/500)) + min(0.1,(card[Position+1][1]/250)) + min(0, ((200-card[Position+1][2])/1000))
+    Form = 0.9 + min(0.10, (card[Position+1][2]/500)) + min(0.1,(card[Position+1][1]/250)) + min(0, ((200-card[Position+1][2])/2000))
     if ((TotalOvers+OverCount) % 90) < 6: #form can't be > 0.9 for the first five overs of the day
         Form = min(Form, 0.9)
 
@@ -1175,7 +1397,7 @@ def BowlChoice (x): #function to decide who bowls the next over
                 if Team2[q-1] == Bowl1: #bowling is changing
                     d = 500
                 if OverCount < 50 and ('Part' in Team2Roles[q-1] or 'Bat' in Team2Roles[q-1]): #less likely to pick rare bowler in first 50 overs
-                    d = d+20
+                    d = d+100
                 Partnership = (Score+RunsOver) - FallOfWicket[-1]
                 if Partnership > 150 and ('Part' in Team2Roles[q-1] or 'Bat' in Team2Roles[q-1]): #but more likely to try and break a long partnership
                     d = d-20
@@ -1191,6 +1413,9 @@ def BowlChoice (x): #function to decide who bowls the next over
                     c = 0.5 - ((d-40)/100)
                 else:
                     c = 0.1 - ((d-80)/1500)
+
+                if c <= 0:
+                    c = (1/1500)
 
                 b = random.random()
                 if b < c and SpellCount[q][0] != Bowl2 and SpellCount[q][0] != Team2WK: #sees if the probability is  met
@@ -1400,7 +1625,7 @@ def over (x): #module calls or contains everything to run an over
         if Wickets > 6 and Target-Score > 50 and RemainingOvers < 50: #if close to losing, play carefully
             AggFactor = 0.7
         if (Target-Score)/RemainingOvers < (10-Wickets) and RemainingOvers < 25: #if you need to push the pace, bat harder
-            if RemainingOvers < 5 and 25 < (Target-Score) < 50 and Wickets < 8:
+            if RemainingOvers <= 5 and (Target-Score) < 50 and Wickets < 8:
                 AggFactor = 1 + 2*((Target-Score)/RemainingOvers)
             else:
                 AggFactor = 1+((10-Wickets)/10)
@@ -1674,6 +1899,8 @@ def innings (BatTeam): #contains each innings
             Results.write(str(' ' + str(FallOfWicket[w]) + '-' + str(w+1) + ' '))
         print (' ')
         Results.write('\n')
+    else:
+        Results.write('\n')
 
 
     Results.write('\n')
@@ -1701,7 +1928,7 @@ def innings (BatTeam): #contains each innings
     time.sleep(delay*2)
 
     print ('') #results
-    if Innings == 3 and Wickets == 10 and ((GameScores[1] + GameScores[9]) > (Score+GameScores[5])): #if the team batting fourth is bowled out
+    if Innings == 3 and Wickets == 10 and ((GameScores[1] + GameScores[9]) > (Score+GameScores[5])) and FollowOn==False: #if the team batting fourth is bowled out
         print (str(str(BowlTeam) + ' wins by ' +str((GameScores[1] + GameScores[9])-(Score+GameScores[5]))) + ' runs.')
         Results.write((str(str(BowlTeam) + ' wins by ' +str((GameScores[1] + GameScores[9])-(Score+GameScores[5]))) + ' runs.'))
         for i in range (0, 22): #Man of Match winning team bonus
@@ -1720,8 +1947,8 @@ def innings (BatTeam): #contains each innings
             if MOM[i][0] in Team1:
                 MOM[i][1] = MOM[i][1] + 100
     elif Innings == 3 and FollowOn==True and Wickets == 10 and (Score+GameScores[1]) < (GameScores[5] + GameScores[9]): #if team follows on and wins
-        print (str(str(BowlTeam) + ' wins by ' +str((GameScores[1] + GameScores[9])-(Score+GameScores[5]))) + ' runs.')
-        Results.write((str(str(BowlTeam) + ' wins by ' +str((GameScores[1] + GameScores[9])-(Score+GameScores[5]))) + ' runs.'))
+        print (str(str(BowlTeam) + ' wins by ' +str((GameScores[5] + GameScores[9])-(Score+GameScores[1]))) + ' runs.')
+        Results.write((str(str(BowlTeam) + ' wins by ' +str((GameScores[5] + GameScores[9])-(Score+GameScores[1]))) + ' runs.'))
         for i in range (0, 22): #Man of Match winning team bonus
             if MOM[i][0] in Team2:
                 MOM[i][1] = MOM[i][1] + 100
@@ -1829,7 +2056,7 @@ def switch (a): #this is the module which swaps sides to start a new innings. ru
         print ()
 
 
-WinningTeam = ''
+WinningTeam = []
 FollowOn = False
 innings (BatTeam) #innings 1
 if GameOvers < OverCount+TotalOvers: #if a draw
@@ -1841,7 +2068,7 @@ else:
     switch (x)
     innings (BatTeam) #innings 2
     switch (x)
-    if GameOvers <= OverCount+TotalOvers:
+    if GameOvers <= OverCount+TotalOvers and Wickets != 10:
         print ('Match Drawn.')
         Results = open('scorecard.txt', 'a')
         Results.write('Match Drawn.')
@@ -1851,7 +2078,7 @@ else:
         print ('Follow-on enforced.')
         switch (x)
         innings (BatTeam) #innings 3
-        if GameOvers <= OverCount+TotalOvers:
+        if GameOvers <= OverCount+TotalOvers and Wickets != 10:
             print ('Match Drawn.')
             Results = open('scorecard.txt', 'a')
             Results.write('Match Drawn.')
@@ -1868,7 +2095,7 @@ else:
             print (str( str(BatTeam) + ' wins by an innings and ' + str(GameScores[1]-(GameScores[5] + GameScores[9])) + ' runs.'))
             Results.write(str( str(BatTeam) + ' wins by an innings and ' + str((GameScores[1]-GameScores[5]-GameScores[9]))     + ' runs.'))
             Results.close()
-            WinningTeam = BatTeam
+            WinningTeam = BowlTeam
     else:
         innings(BatTeam) #innings3
         if Score + GameScores[1] < GameScores[5] and Wickets == 10:
@@ -1876,8 +2103,8 @@ else:
             Results = open('scorecard.txt', 'a')
             Results.write(str( str(BowlTeam) + ' wins by an innings and ' + str((GameScores[5]-GameScores[1]-Score))    + ' runs.'))
             Results.close()
-            WinningTeam=BowlTeam
-        elif GameOvers <= OverCount+TotalOvers:
+            WinningTeam = BowlTeam
+        elif GameOvers <= OverCount+TotalOvers and Wickets != 10:
             print ('Match Drawn.')
             Results = open('scorecard.txt', 'a')
             Results.write('Match Drawn.')
@@ -1892,7 +2119,12 @@ for i in range (0, 22):
     if MOM[i][0] in WinningTeam:
         MOM[i][1] = MOM[i][1] + 100 #winning team gets a 100point MOM bonus
 
-if GameOvers <= OverCount+TotalOvers:
+scorecard = []
+aa = open('scorecard.txt', 'r')
+for line in aa:
+    scorecard.append(line)
+    
+if GameOvers <= OverCount+TotalOvers and 'Match Drawn' not in scorecard:
     print ('Match Drawn.')
     Results = open('scorecard.txt', 'a')
     Results.write('Match Drawn.')
@@ -1905,10 +2137,11 @@ Results = open('scorecard.txt', 'a')
 Results.write('\n')
 Results.write( str ('Man of the Match: ' + str(MOM[0][0])))
 Results.write('\n')
-Results.write('\n')
-Results.write(str('Pitch: Pace ' +str(round(PaceFactor**2,2)) + ', Spin ' + str(round(SpinFactor**2,2))))
+PaceFactor, SpinFactor = PaceFactor**2, SpinFactor**2
+Results.write('Pace: {}, Spin: {}'.format(round(PaceFactor,2), round(SpinFactor,2)))
 Results.close()
-
+PitchReport (PaceFactor, SpinFactor)
 print ('Results saved to scorecard.txt')
+
 print ('')
 print ('') #end of program

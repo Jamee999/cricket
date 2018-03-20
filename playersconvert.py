@@ -49,7 +49,7 @@ for i in range (0, 10):
         MidYear.append(Years[i][0])
         Years.append(ERYears[i][1])
 
-    for i in range (1, len(Lines)): 
+    for i in range (0, len(Lines)): 
         GameData = []
         Input = Lines[i]
         Set = Input.split(',')
@@ -87,6 +87,9 @@ for i in range (0, 10):
         CaptGames = Set[16]
         WKGames = Set[17]
         OpenInns = Set[18]
+
+        FCBatAv = min(FCBatAv, 50)
+        FCBowlAv = max (FCBowlAv, 23)
         
         GameData.append(Set[0])
 
@@ -112,11 +115,12 @@ for i in range (0, 10):
             RawTestBatAv = Runs
         if TimesOut < 35:
             if LastYear >= 2016 and TimesOut < 20:
-                AdjustedBatAv = max(3,(min(FCBatAv/1.25,FCBatAv-10)))
-                AdjustedBatAv = ((TimesOut*RawTestBatAv) + ((35-TimesOut)*(AdjustedBatAv)))/35
+                x = max(3,(min(FCBatAv/1.25,FCBatAv-10)))
+                AdjustedBatAv = ((TimesOut*RawTestBatAv) + ((35-TimesOut)*x))/35
             elif FCGames >= 30:
-                AdjustedBatAv = ((TimesOut*RawTestBatAv) + ((35-TimesOut)*(FCBatAv/1.75)))/35
-            elif (FCGames+TimesOut) <= 30:
+                x = max((1.75 - (FCGames-30)/750), (4/3))
+                AdjustedBatAv = ((TimesOut*RawTestBatAv) + ((35-TimesOut)*(FCBatAv/x)))/35
+            elif FCGames < 30:
                 AdjustedBatAv = (RawTestBatAv/3) + (FCBatAv/5.25) + 6
         else:
             AdjustedBatAv = RawTestBatAv
@@ -127,7 +131,7 @@ for i in range (0, 10):
         if Wickets != 0:
             RawBowlAv = (RunsAllowed/Wickets)
         else:
-            RawBowlAv = 300
+            RawBowlAv = max (40, RunsAllowed)
         if BallsBowled == 0:
             AdjustedBowlAv = 400
         elif FCWickets < 10:
@@ -137,7 +141,9 @@ for i in range (0, 10):
             AdjustedBowlAv = ((RawBowlAv*BallsBowled) + ((10000-BallsBowled)*AdjustedBowlAv))/10000
 
         elif BallsBowled < 10000 and FCWickets >= 100:
-            AdjustedBowlAv = ((RawBowlAv*BallsBowled) + ((10000-BallsBowled)*FCBowlAv*1.75))/10000
+            x = max((4/3), 1.75 - (FCWickets-100)/2000)
+            AdjustedBowlAv = ((RawBowlAv*BallsBowled) + ((10000-BallsBowled)*FCBowlAv*x))/10000
+            
         elif BallsBowled < 10000 and FCWickets < 100:
             AdjustedBowlAv= (RawBowlAv/3) + (FCBowlAv*(7/12)) + 20
         if BallsBowled > 10000:
@@ -148,11 +154,11 @@ for i in range (0, 10):
         EraAdjustedBowlAv = round(EraAdjustedBowlAv, 2)
         GameData.append(EraAdjustedBowlAv)
 
-        if WKGames >= 10 or (WKGames/Tests) >=0.5:
+        if WKGames >= 40 or (WKGames/Tests) >=(1/3):
             Role = 'WK'
         elif (BallsBowled/Tests) < 24:
             Role = 'Bat'
-        elif (Wickets/Tests) < 1.5:
+        elif (Wickets/Tests) < 1.5 and ((BallsBowled/Tests) < 90 or EraAdjustedBatAv > 20):
             if 'fast' in BowlStyle:
                 Role = 'PartFast'
             elif 'spin' in BowlStyle or 'break' in BowlStyle or 'slow' in BowlStyle:
@@ -167,7 +173,7 @@ for i in range (0, 10):
             else:
                 Role = 'Med'
 
-        if OpenInns > 20 or (OpenInns/Tests > 0.8):
+        if OpenInns > 50 or (OpenInns/Tests > 0.8):
             Role = 'Open' + Role
 
         try:
@@ -178,7 +184,16 @@ for i in range (0, 10):
         try:
             BowlER = (RunsAllowed/BallsBowled) / (float(EconAv)/6)
         except:
-            BowlER = 1.4
+            BowlER = 1.2
+
+        if BowlER == 0:
+            BowlER = 1.2
+
+        if BowlER > 1.2:
+            BowlER = 1.2
+
+        if BowlER < 0.8:
+            BowlER = 0.8
 
         GameData.append(Role)
         GameData.append(FirstYear)

@@ -64,7 +64,7 @@ while len(TeamNames) < Number:
     else:       
         TeamNames.append(y)
 
-if ('East London' or 'South London') in TeamNames and London in TeamNames:
+if ('East London' or 'South London') in TeamNames and 'London' in TeamNames:
     TeamNames[0] = 'North London'
 else:
     TeamNames[0] = TeamNames[0]

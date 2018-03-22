@@ -368,12 +368,14 @@ def RecreateSelect (x): #module that runs to select recreated tests
         findtext = '{} 1st Innings'.format(x) #finds the team's first batsmen
         player = soup.find(text = findtext).parent.parent.parent.next_sibling.contents[0].contents[0].contents[1].contents[0].contents[0].contents[0]
         players.append(player)
+        #print (player)
         n = 1
         for i in range (1,11): #find the next ten players
             try:
                 player = soup.find(text = findtext).parent.parent.parent.next_sibling.contents[0].contents[i].contents[0].contents[0].contents[0].contents[0]
                 if '<' not in player and 'Fall of wickets' not in player and 'Did not bat' not in player:
                     players.append(player)
+                    #print (player.parent.parent.contents)
                     n = n+1
             except:
                 n = n
@@ -383,6 +385,7 @@ def RecreateSelect (x): #module that runs to select recreated tests
             player = player.replace(', ','')
             if 'Did not bat' not in player:
                 players.append(player)
+                #print (player)
                 n = n+1
                 c = c+1
         #print (players)
@@ -407,6 +410,28 @@ def RecreateSelect (x): #module that runs to select recreated tests
                     break
         return Players
 
+    def PlayerValidate (x):
+        if 'jnr' in x:
+            x = x.replace('jnr', ' jnr')
+        if 'snr' in x:
+            x = x.replace('snr', ' snr')
+        if "Sir TC O'Brien" in x:
+            x = x.replace('Sir ', '')
+        if 'RJ Hadlee' in x:
+            x = 'Sir RJ Hadlee'
+        if 'Hon.LH Tennyson' in x:
+            x = x.replace('Hon.LH', 'Lord')
+        if 'OC Da Costa' in x:
+            x = x.replace('Da', 'da')
+        if 'Mehrab Hossain' in x:
+            x = 'Mehrab Hossain jnr'
+        if 'Enamul Haque' in x:
+            x = 'Enamul Haque jnr'
+            
+
+        return x
+
+
     print ('')
     print (str(ValidTests[q][1]))
     print ('')    
@@ -425,10 +450,7 @@ def RecreateSelect (x): #module that runs to select recreated tests
         if ' †' in HomeTeam[i]:
             HomeTeam[i] = HomeTeam[i].replace(' †','')
             HomeWK = HomeTeam[i]
-        if 'jnr' in HomeTeam[i]:
-            HomeTeam[i] = HomeTeam[i].replace('jnr', ' jnr')
-        if 'snr' in HomeTeam[i]:
-            HomeTeam[i] = HomeTeam[i].replace('snr', ' snr')
+        HomeTeam[i] = PlayerValidate(HomeTeam[i])
     HomeTeamData = ReadPlayers (HomeTeam, ValidTests[q][1])
     print ('')
     print (str(ValidTests[q][2]))
@@ -448,11 +470,7 @@ def RecreateSelect (x): #module that runs to select recreated tests
         if ' †' in AwayTeam[i]:
             AwayTeam[i] = AwayTeam[i].replace(' †','')
             AwayWK = AwayTeam[i]
-        if 'jnr' in AwayTeam[i]:
-            AwayTeam[i] = AwayTeam[i].replace('jnr', ' jnr')
-            continue
-        if 'snr' in AwayTeam[i]:
-            AwayTeam[i] = AwayTeam[i].replace('snr', ' snr')
+        AwayTeam[i] = PlayerValidate(AwayTeam[i])
     AwayTeamData = ReadPlayers (AwayTeam, ValidTests[q][2])
     #print (HomeTeamData, AwayTeamData)
 

@@ -22,13 +22,13 @@ python-dateutil==2.6.1
 python-espncricinfo==0.3.1
 pytz==2017.3
 regex==2018.2.8
-requests==2.18.4
+requests==2.20
 requests-toolbelt==0.8.0
 ruamel.yaml==0.15.35
 six==1.11.0
 tqdm==4.19.8
 twine==1.11.0
 tzlocal==1.5.1
-urllib3==1.22
+urllib3==1.23
 virtualenv==15.1.0
 virtualenv-clone==0.2.6

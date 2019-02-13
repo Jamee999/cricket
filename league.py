@@ -1,4 +1,7 @@
-import random, time, os, pexpect, shutil
+import random, time, os, pexpect, shutil, datetime
+
+CurrentTime = datetime.datetime.now()
+CurrentYear = CurrentTime.year
 
 print ('')
 print ('')
@@ -7,7 +10,7 @@ y = 0
 Number = 0
 Games = 0
 
-while y < 1877 or y > 2018:
+while y < 1877 or y > CurrentYear:
     y = input('What year should teams be selected from? ')
     if y == 'all':
         y = 2019

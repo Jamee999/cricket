@@ -1,4 +1,7 @@
-import random, time, os, pexpect, shutil, copy
+import random, time, os, pexpect, shutil, copy, datetime
+
+CurrentTime = datetime.datetime.now()
+CurrentYear = CurrentTime.year
 
 print ('')
 print ('')
@@ -28,7 +31,7 @@ Year = 0
 Number = 0
 Games = 0
 
-while Year < 1877 or Year > 2018:
+while Year < 1877 or Year > CurrentYear:
     Year = input('What year would you like to draft players from? ')
     if Year == 'all':
         break

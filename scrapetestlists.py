@@ -1,6 +1,10 @@
 from bs4 import BeautifulSoup
 import requests
 import re
+import datetime
+
+CurrentTime = datetime.datetime.now()
+CurrentYear = CurrentYear.year
 
 def get_num(x):
     return int(''.join(ele for ele in x if ele.isdigit()))
@@ -18,7 +22,7 @@ def gamescrape (Year):
 g = open('testmatchlist.txt', 'w')
 g.close()
 
-for x in range (1877, 2019):
+for x in range (1877, CurrentYear+1):
     y = 0
     try:
         games = gamescrape(x)

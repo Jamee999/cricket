@@ -1,6 +1,8 @@
 import random, time
 import datetime
 
+CurrentTime = datetime.datetime.now()
+CurrentYear = CurrentTime.year
 
 BatAbi = 1 #batsman's ability
 BowlAbi = 1 #bowler's ability
@@ -34,7 +36,7 @@ def CustomOrHistorical (x):
 
 def HistoricalYearsSelect (x):
     valid = 0
-    Years = [x for x in range (1877, 2019) if x < 1914 or x > 1946 or 1919 < x < 1939] #Defines acceptable years
+    Years = [x for x in range (1877, CurrentYear+1) if x < 1914 or x > 1946 or 1919 < x < 1939] #Defines acceptable years
     while valid == 0: #loops until given acceptable answer
         YearInput = str(input("Type 'all' for all-time teams, 'random' for a random year, or input a year (or range of years): ")) #User Input
         YearInput = ''.join(YearInput.split()) #removing spaces
@@ -54,7 +56,7 @@ def HistoricalYearsSelect (x):
 
         elif YearInput == 'all':
             valid = 1
-            return '1877-2018'
+            return '1877-{}'.format(CurrentYear)
 
         elif "-" in YearInput: #sees if a range has been selected
             Range = YearInput
@@ -63,7 +65,7 @@ def HistoricalYearsSelect (x):
             if Range[0] == '': #validates blank sides of ranges as being equal to the smallest or largest possible value
                 Range[0] = str(1877)
             if Range[1] == '':
-                Range [1] = str(2018)
+                Range [1] = str(CurrentYear)
             #print (Range)
             try:
                 if int(Range[0]) in Years and int(Range[1]) in Years: #checks if the two range inputs are acceptable years
@@ -295,11 +297,11 @@ def CallPlayers (a, x, y):
 
 def RecreateSelect (x): #module that runs to select recreated tests
     y = 0
-    while (1877 > y or y > 2018) and y!= 'all': #loop until given a valid year
+    while (1877 > y or y > CurrentYear) and y!= 'all': #loop until given a valid year
         try:
             y = input('Which year did your test match take place in? ')
             if y == 'random':
-                y = random.choice(1877, 2018)
+                y = random.choice(1877, CurrentYear)
                 y = int(y)
                 break
             if y == 'all':
@@ -494,7 +496,7 @@ def Choice (x):
 
     elif mode == 'custom':
         FirstYear = 1877
-        LastYear = 2018
+        LastYear = CurrentYear
         Players = CustomSelect (x)
         return Players
 

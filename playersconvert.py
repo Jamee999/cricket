@@ -34,6 +34,7 @@ for i in range (0, 10):
             ERYears.append(x)
             #print (x)
     ERYears.append(['2018','3.11'])
+    ERYears.append(['2019','3.11'])
 
     Averages = []
     MidYear = []
@@ -41,7 +42,7 @@ for i in range (0, 10):
     Players = []
     AllData = []
 
-    for i in range (0, 142):
+    for i in range (0, 143):
         Years[i][0] = int(Years[i][0])
         Years[i][1] = float(Years[i][1])
         ERYears[i][0] = float(ERYears[i][0])
@@ -53,25 +54,31 @@ for i in range (0, 10):
         GameData = []
         Input = Lines[i]
         Set = Input.split(',')
+        print (Set)
         Set[0] = Set[0][1:-1]
         Set[1] = Set[1][2:-1]
         for j in range (2, 19):
-     #       Set[j] = Set[j][1:-0]
+            Set[j] = Set[j].strip()
             try:
                 Set[j] = int(Set[j])
             except:
                 try:
                     Set[j] = float(Set[j])
                 except:
-                    Set[j] = 0
-        
-        #print (Set)
+                    try:
+                        Set[j] = int(Set[j][1:-1])
+                    except:
+                        try:
+                            Set[j] = float(Set[j][1:-1])
+                        except:
+                            Set[j] = 0
+                                           
         Name = Set[0]
         BowlStyle = Set[1]
         BowlStyle = BowlStyle.lower()
         Tests = Set[2]
-        Runs = Set[3]
-        BallsFaced = Set[4]
+        Runs = Set[3] 
+        BallsFaced = Set[4] 
         TimesOut = Set[5]
         BallsBowled = Set[6]
         RunsAllowed = Set[7]
@@ -154,6 +161,7 @@ for i in range (0, 10):
         EraAdjustedBowlAv = round(EraAdjustedBowlAv, 2)
         GameData.append(EraAdjustedBowlAv)
 
+        print (Name, Tests)
         if WKGames >= 40 or (WKGames/Tests) >=(1/3):
             Role = 'WK'
         elif (BallsBowled/Tests) < 24:

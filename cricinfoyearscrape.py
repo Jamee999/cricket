@@ -49,7 +49,9 @@ def scrape (Year):
     f.close()
     print (Year, Average)
 
-#scrape (2018)
-    
-for i in range (1918 , 2018):
+import datetime
+CurrentTime = datetime.datetime.now()
+CurrentYear = CurrentTime.year
+
+for i in range (1918 , CurrentYear+1):
     scrape (i)

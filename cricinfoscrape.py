@@ -1,8 +1,10 @@
 # THIS FILE SCRAPES DATA FROM CRICINFO, TURNS IT INTO READABLE DATA, AND EXPORTS IT TO PLAYERS.TXT
 
+print ('WARNING: THIS FILE MAY TAKE A LONG TIME TO COMPLETE RUNNING.')
+
 a = 700 #Number of players to read, starting with Cap 1 for the country (doesn't need to be exact, program will end with an error but still execute)
-b = 25 # Cricinfo Team ID: 1 = England, 2 = Australia, 3 = South Africa, 4 = West Indies, 5 = New Zealand, 6 = India, 7 = Pakistan, 8 = Sri Lanka, 9 = Zimbabwe, 25 = Bangladesh
-c = 'bangladeshplayers.txt' #file to write to
+b = 1 # Cricinfo Team ID: 1 = England, 2 = Australia, 3 = South Africa, 4 = West Indies, 5 = New Zealand, 6 = India, 7 = Pakistan, 8 = Sri Lanka, 9 = Zimbabwe, 25 = Bangladesh
+c = 'englandplayers.txt' #file to write to
 
 from bs4 import BeautifulSoup
 import requests
@@ -48,8 +50,7 @@ def scrape (x):
     for i in range (1, len(header)):
         header[i] = header[i].contents
         HeaderStats.append(header[i][0])
-        
-    #print (HeaderStats)
+    
 
     TestBatData = soup.find(text='Tests')
     TestBatData = TestBatData.parent.parent.parent.parent.parent
@@ -58,41 +59,37 @@ def scrape (x):
     TestBatStats = []
 
     for i in range(1,(len(TestBatData))):
-        TestBatData[i] = TestBatData[i].contents
-        TestBatData[i][0] = TestBatData[i][0].replace('\n\t\t\t\t\t','')
+        #print (TestBatData[i])
         try:
-            TestBatData[i][0] = int(TestBatData[i][0][3::])
+            TestBatData[i] = TestBatData[i].contents[0]
         except:
-            try:
-                TestBatData[i][0] = float(TestBatData[i][0][3::])
-            except:
-                1 == 1
+            pass
+        #print (TestBatData[i])
+        #TestBatData[i][0] = TestBatData[i][0].replace('\n\t\t\t\t\t','')
 
-        TestBatStats.append(TestBatData[i][0])
-
-    #print (TestBatStats)
-
+        TestBatStats.append(TestBatData[i])
 
     for i in range(0, len(HeaderStats)):
         if HeaderStats[i] == 'Mat':
             ReducedStats.append(TestBatStats[i])
         if HeaderStats[i] == 'Inns':
-            Inns = TestBatStats [i]
+            Inns = TestBatStats[i]
         if HeaderStats[i] == 'NO':
-            NO = TestBatStats [i]
+            NO = TestBatStats[i]
         if HeaderStats[i] == 'Runs':
             ReducedStats.append(TestBatStats[i])
         if HeaderStats[i] == 'BF':
             ReducedStats.append(TestBatStats[i])
     if 'BF' not in HeaderStats:
         ReducedStats.append(' ')
-
- #       if HeaderStats[i] == 'Ave':
- #           ReducedStats.append(TestBatStats[i])
     try:
-        ReducedStats.append ((Inns-NO))
+        ReducedStats.append((int(Inns)-int(NO)))
     except:
-        ReducedStats.append(0)
+        try:
+            ReducedStats.append(Inns)
+        except:
+            ReducedStats.append(0)
+
 
     TestBowlStats = []
 
@@ -102,18 +99,23 @@ def scrape (x):
     TestBowlData = TestBowlData.findAll('td')
 
     for i in range(1,(len(TestBowlData))):
-        TestBowlData[i] = TestBowlData[i].contents
-        TestBowlData[i][0] = TestBowlData[i][0].replace('\n\t\t\t\t\t','')
         try:
-            TestBowlData[i][0] = int(TestBowlData[i][0][3::])
+            TestBowlData[i] = TestBowlData[i].contents[0]
+        except:
+            pass
+        #TestBowlData[i] = TestBowlData[i].replace('\n\t\t\t\t\t','')
+        try:
+            TestBowlData[i] = int(TestBowlData[i])
         except:
             try:
-                TestBowlData[i][0] = float(TestBowlData[i][0][3::])
+                TestBowlData[i] = float(TestBowlData[i])
             except:
-                1 == 1
+                pass
                 
-        TestBowlStats.append(TestBowlData[i][0])
-
+        TestBowlStats.append(TestBowlData[i])
+        
+    #print (TestBowlStats)
+    
     bowlheader = soup.find(text='BBM')
     bowlheader = bowlheader.parent.parent.parent
     bowlheader = bowlheader.findAll('th')
@@ -156,24 +158,32 @@ def scrape (x):
     FCBatStats = []
 
     for i in range(1,(len(FCBatData))):
-        FCBatData[i] = FCBatData[i].contents
-        FCBatData[i][0] = FCBatData[i][0].replace("\n\t\t\t\t\t\t",'')
-        FCBatData[i][0] = FCBatData[i][0].replace("\n\t\t\t\t\t",'')
-        FCBatData[i][0] = FCBatData[i][0].replace("\t",'')
-        FCBatData[i][0] = FCBatData[i][0].replace('\n','')
-        FCBatData[i][0] = FCBatData[i][0][2::]
         try:
-            FCBatData[i][0] = int(FCBatData[i][0])
+            FCBatData[i] = FCBatData[i].contents[0]
+        except:
+            pass
+        #print (FCBatData[i])
+        #FCBatData[i][0] = FCBatData[i][0].replace("\n\t\t\t\t\t\t",'')
+        #FCBatData[i][0] = FCBatData[i][0].replace("\n\t\t\t\t\t",'')
+        #FCBatData[i][0] = FCBatData[i][0].replace("\t",'')
+        #FCBatData[i][0] = FCBatData[i][0].replace('\n','')
+        #FCBatData[i][0] = FCBatData[i][0][2::]
+        try:
+            FCBatData[i] = int(FCBatData[i])
         except:
             try:
-                FCBatData[i][0] = float(FCBatData[i][0])
+                FCBatData[i] = float(FCBatData[i])
             except:
-                1 == 1
-        FCBatStats.append(FCBatData[i][0])
+                pass
+        try:
+            FCBatStats.append(FCBatData[i][0])
+        except:
+            FCBatStats.append(FCBatData[i])
 
     for i in range(0, len(HeaderStats)):
         if HeaderStats[i] == 'Mat':
             ReducedStats.append(FCBatStats[i])
+            FCGames = FCBatStats[i]
         if HeaderStats[i] == 'Inns':
  #           ReducedStats.append(FCBatStats[i])
             FCInns = FCBatStats[i]
@@ -189,8 +199,8 @@ def scrape (x):
 
     #print (FCBatStats)
 
-    # print ('[Name, BowlStyle, Games, Inns, NO, RunsSc, Balls, RunsAg, Wic, FirstTest, LastTest, FCGames, FCRuns, FCBatAve, FCInns, FCWickets, FCBowlAve]')
-
+    #print ('[Name, BowlStyle, Games, Inns, NO, RunsSc, Balls, RunsAg, Wic, FirstTest, LastTest, FCGames, FCRuns, FCBatAve, FCInns, FCWickets, FCBowlAve]')
+    #print (ReducedStats)
 
 
 
@@ -202,19 +212,22 @@ def scrape (x):
     FCBowlData = FCBowlData.findAll('td')
 
     for i in range(1,(len(FCBowlData))):
-        FCBowlData[i] = FCBowlData[i].contents
-        FCBowlData[i][0] = FCBowlData[i][0].replace('\n\t\t\t\t\t','')
-        FCBowlData[i][0] = FCBowlData[i][0].replace('\t','')
-        FCBowlData[i][0] = FCBowlData[i][0].replace('\n','')
         try:
-            FCBowlData[i][0] = int(FCBowlData[i][0][2::])
+            FCBowlData[i] = FCBowlData[i].contents[0]
+        except:
+            pass
+        #FCBowlData[i][0] = FCBowlData[i][0].replace('\n\t\t\t\t\t','')
+        #FCBowlData[i][0] = FCBowlData[i][0].replace('\t','')
+        #FCBowlData[i][0] = FCBowlData[i][0].replace('\n','')
+        try:
+            FCBowlData[i] = int(FCBowlData[i])
         except:
             try:
-                FCBowlData[i][0] = float(FCBowlData[i][0][2::])
+                FCBowlData[i] = float(FCBowlData[i])
             except:
-                1 == 1
-                
-        FCBowlStats.append(FCBowlData[i][0])
+                pass
+        #print (FCBowlData[i])
+        FCBowlStats.append(FCBowlData[i])
 
     #print (FCBowlStats)
     bowlheader = soup.find(text='BBM')
@@ -304,7 +317,7 @@ def guruscrape (x):
     except:
         Bat2Inns = 0
     OpenInns = Bat1Inns + Bat2Inns
-    print (CaptainGames, WKGames, OpenInns)
+    #print (CaptainGames, WKGames, OpenInns)
     ReducedStats.append(OpenInns)
         
         
@@ -321,26 +334,48 @@ def PlayerList (x, y):
     f.close()   
     f = open(c,'w')
     for i in range (1, (x+1)):
-        ReducedStats = []
-        HTMLString = newsoup.find(text=i)
-        HTMLString = str(HTMLString.parent.parent.contents[3])
-        PlayerNo = HTMLString[75::]
-        PlayerNo = PlayerNo.split('.html')
-        PlayerNo = PlayerNo[0]
-        #print (PlayerNo)
-        ShortName = HTMLString.split('middle;">')
-        ShortName = ShortName[1][:-9]
-        ReducedStats.append(ShortName)
-        scrape (PlayerNo)
-        guruscrape (PlayerNo)
-        print (ReducedStats)
-        f.write(str(ReducedStats))
-        f.write('\n')
+        try:
+            ReducedStats = []
+            HTMLString = newsoup.find(text=i)
+            HTMLString = str(HTMLString.parent.parent.contents[3])
+            PlayerNo = HTMLString[75::]
+            PlayerNo = PlayerNo.split('.html')
+            PlayerNo = PlayerNo[0]
+            #print (PlayerNo)
+            ShortName = HTMLString.split('middle;">')
+            ShortName = ShortName[1][:-9]
+            ReducedStats.append(ShortName)
+            scrape (PlayerNo)
+            guruscrape (PlayerNo)
+            print (ReducedStats)
+            f.write(str(ReducedStats))
+            f.write('\n')
+        except:
+            break
     f.close()
         
 
 #print ('[Name, BowlStyle, Games, Inns, NO, RunsSc, Balls, RunsAg, Wic, FirstTest, LastTest, FCGames, FCRuns, FCBatAve, FCInns, FCWickets, FCBowlAve]')
 
-results =  str(PlayerList (a, b))
+nations = ['england','australia','southafrica','westindies','newzealand','india','pakistan','srilanka','zimbabwe','bangladesh']
+iddict = {
+    'england' : 1,
+    'australia' : 2,
+    'southafrica' : 3,
+    'westindies' : 4,
+    'newzealand' : 5,
+    'india' : 6,
+    'pakistan' : 7,
+    'srilanka' : 8,
+    'zimbabwe' : 9,
+    'bangladesh' : 25
+    }
+    
+for i in nations:
+    a = 750
+    b = iddict[i]
+    c = '{}players.txt'.format(i)
+    results =  str(PlayerList (a, b))
+    print (str('Output sent to ' + str(c)))
 
-print (str('Output sent to ' + str(c)))
+print ('After scrape is completed for all nations, run the file "playersconvert.py"')

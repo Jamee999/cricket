@@ -357,7 +357,7 @@ def PlayerList (x, y):
 
 #print ('[Name, BowlStyle, Games, Inns, NO, RunsSc, Balls, RunsAg, Wic, FirstTest, LastTest, FCGames, FCRuns, FCBatAve, FCInns, FCWickets, FCBowlAve]')
 
-nations = ['england','australia','southafrica','westindies','newzealand','india','pakistan','srilanka','zimbabwe','bangladesh']
+nations = ['england','australia','southafrica','westindies','newzealand','india','pakistan','srilanka','zimbabwe','bangladesh','afghanistan','ireland']
 iddict = {
     'england' : 1,
     'australia' : 2,
@@ -368,7 +368,9 @@ iddict = {
     'pakistan' : 7,
     'srilanka' : 8,
     'zimbabwe' : 9,
-    'bangladesh' : 25
+    'bangladesh' : 25,
+    'afghanistan' : 40,
+    'ireland' : 29
     }
     
 for i in nations:

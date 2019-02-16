@@ -1,12 +1,12 @@
 import random
 
-nations = ['england', 'australia', 'southafrica', 'westindies', 'newzealand', 'india', 'pakistan', 'srilanka', 'zimbabwe', 'bangladesh']
+nations = ['england', 'australia', 'southafrica', 'westindies', 'newzealand', 'india', 'pakistan', 'srilanka', 'zimbabwe', 'bangladesh', 'afghanistan', 'ireland']
 
 h = open ('alldata.txt','w')
 h.close()
 
-for i in range (0, 10):
-    country = nations[i]
+for i in nations:
+    country = i
 
     Lines = []
     with open(str(str(country) + 'players.txt')) as f:
@@ -26,7 +26,7 @@ for i in range (0, 10):
             #print (x)
 
     ERYears = []
-    with open ('ERdata.txt') as f:
+    with open ('er_data.txt') as f:
         for line in f:
             line = line[:-1]
             #print (line)

@@ -58,6 +58,10 @@ def HistoricalYearsSelect (x):
             valid = 1
             return '1877-{}'.format(CurrentYear)
 
+        elif YearInput == 'current':
+            valid = 1
+            return '{}-{}'.format(CurrentYear-2, CurrentYear)
+
         elif "-" in YearInput: #sees if a range has been selected
             Range = YearInput
             Range = Range.split('-') #turns into a set [Year1, Year2]
@@ -242,7 +246,10 @@ def CountrySelect(x,y):
     global Team1Name, Team1Years, FirstYear, LastYear
     x = int(x)
     y = int(y)
-    Teams = ['England', 'Australia', 'South Africa', 'West Indies', 'New Zealand', 'India', 'Pakistan', 'Sri Lanka', 'Zimbabwe', 'Bangladesh', 'random', 'all']
+    Teams = ['England', 'Australia', 'South Africa', 'West Indies', 'New Zealand', 'India', 'Pakistan', 'Sri Lanka', 'Zimbabwe', 'Bangladesh', 'Ireland', 'Afghanistan', 'random', 'all']
+    if y < 2018:
+        Teams.remove('Ireland')
+        Teams.remove('Afghanistan')
     if y < 2000: #remove teams from ineligible years.
         Teams.remove('Bangladesh')
     if y < 1992:
@@ -265,7 +272,7 @@ def CountrySelect(x,y):
 
     valid = 0
     while valid == 0: #cycles until given valid input
-        SelectedTeam = str( input ('Select a team. The options are: ' + str(Teams)))
+        SelectedTeam = str( input ('Select a team. The options are: ' + str(Teams) + ' '))
         if SelectedTeam == 'random':
             Teams.remove('random')
             Teams.remove('all')

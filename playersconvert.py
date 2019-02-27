@@ -96,7 +96,10 @@ for i in nations:
         OpenInns = Set[18]
 
         FCBatAv = min(FCBatAv, 50)
-        FCBowlAv = max (FCBowlAv, 23)
+        if AvYear > 1900:
+            FCBowlAv = max (FCBowlAv, 23)
+        else:
+            FCBowlAv = max (FCBowlAv, 13)
         
         GameData.append(Set[0])
 

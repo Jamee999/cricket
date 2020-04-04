@@ -1056,7 +1056,7 @@ def game (s, g):
 
 	k = [x for x in allplayers if x.games == 0]
 	h = [x.name for x in allplayers if x.games == 0]
-	h = quickorder(h)
+	h = quicksort(h)
 
 	if g == s.games[0]:
 		print ()

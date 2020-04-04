@@ -1055,8 +1055,9 @@ def game (s, g):
 	print ()
 
 	k = [x for x in allplayers if x.games == 0]
-	h = [x.name for x in allplayers if x.games == 0]
+	h = [x for x in allplayers if x.games == 0]
 	h = quicksort(h)
+	h = [x.name for x in h]
 
 	if g == s.games[0]:
 		print ()
@@ -1310,7 +1311,7 @@ def seasonstats (p, t):
 
 		print ('Most runs in', str(t))
 		for i in a[:n]:
-			print (i[0].name.ljust(20), i[0].team.name.just(13), str(i[1]).rjust(4), "runs @", str(i[2]).rjust(5))
+			print (i[0].name.ljust(20), i[0].team.ljust(13), str(i[1]).rjust(4), "runs @", str(i[2]).rjust(5))
 		print ()
 
 		a = []
@@ -1322,7 +1323,7 @@ def seasonstats (p, t):
 		a.sort(key = lambda x: x[1], reverse = True)
 
 		print ('Most wickets in', str(t))
-		for i in a[:n]: print (i[0].name.ljust(20), i[0].team.name.just(13), str(i[1]).rjust(4), "wickets @", str(i[2]).rjust(5))
+		for i in a[:n]: print (i[0].name.ljust(20), i[0].team.ljust(13), str(i[1]).rjust(4), "wickets @", str(i[2]).rjust(5))
 		print ()
 
 

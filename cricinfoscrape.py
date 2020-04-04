@@ -11,28 +11,18 @@ import requests
 import re
 
 def scrape (x):
-
     global ReducedStats
-    
     url = str('http://www.espncricinfo.com/ci/content/player/' + str(x) + '.html')
     r = requests.get(url)
     player = r.content
-
     soup = BeautifulSoup(player, 'html.parser')
 
- #   ReducedStats = []
-
-    def comprehend (x):
-        global ReducedStats
-        Name = soup.find(text = x).parent.parent.span.contents
+    try:
+        Name = soup.find(text = 'Bowling style').parent.parent.span.contents
         Name[0] = Name[0].replace(',',' ')
         ReducedStats.append(Name[0])
-
-    #comprehend ('Full name')
-    try:
-        comprehend ('Bowling style')
     except:
-        ReducedStats.append(' ')
+        ReducedStats.append('')
 
     #print (Style)
 
@@ -251,6 +241,15 @@ def scrape (x):
     #print ('Name, BowlStyle, Tests, Runs, BallsFaced WHERE POSSIBLE, TimesOut, Balls, Runs, Wickets, FirstYear, LastYear, FCGames, FCRuns, FCBatAve, FCWickets, FCBowlAve, GamesCaptained, Games WK')
     
 
+    try:
+        y = soup.find(text = 'Born').parent.parent.span.contents
+        y[0] = y[0].split(',')
+        ReducedStats.append(int(y[0][1]))
+    except:
+        if ReducedStats[0] == 'FJ Cook':
+            ReducedStats.append(1870)
+        elif ReducedStats[0] == 'KJ Arnott':
+            ReducedStats.append(1961)
 
 
 def guruscrape (x):
@@ -320,7 +319,6 @@ def guruscrape (x):
     #print (CaptainGames, WKGames, OpenInns)
     ReducedStats.append(OpenInns)
         
-        
 def PlayerList (x, y):
     global ReducedStats, c
     url = str(str('http://www.espncricinfo.com/ci/content/player/caps.html?country=') +str(y)+ str(';class=1'))
@@ -353,11 +351,12 @@ def PlayerList (x, y):
         except:
             break
     f.close()
-        
+
 
 #print ('[Name, BowlStyle, Games, Inns, NO, RunsSc, Balls, RunsAg, Wic, FirstTest, LastTest, FCGames, FCRuns, FCBatAve, FCInns, FCWickets, FCBowlAve]')
 
 nations = ['england','australia','southafrica','westindies','newzealand','india','pakistan','srilanka','zimbabwe','bangladesh','afghanistan','ireland']
+
 iddict = {
     'england' : 1,
     'australia' : 2,

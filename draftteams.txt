@@ -1,0 +1,256 @@
+London
+Melbourne
+Mumbai
+Cape Town
+Bridgetown
+Kolkata
+Sydney
+Manchester
+Auckland
+Colombo
+Delhi
+Dhaka
+Kingston
+Johannesburg
+Abu Dhabi
+Perth
+Harare
+New York
+Birmingham
+Karachi
+Wellington
+Georgetown
+Chennai
+Brisbane
+Durban
+Port of Spain
+Kabul
+Dublin
+Galle
+Chittagong
+Adelaide
+Nottingham
+Islamabad
+Christchurch
+Bangalore
+Kandy
+Tokyo
+Port Elizabeth
+Leeds
+Faisalabad
+Hamilton
+Bulawayo
+Antigua
+Hong Kong
+Hobart
+Sharjah
+Mohali
+South London
+Los Angeles
+Centurion
+Ahmedabad
+Cardiff
+Dunedin
+Peshawar
+Amsterdam
+Rawalpindi
+Nairobi
+Toronto
+Bloemfontein
+Singapore
+Napier
+Windhoek
+Edinburgh
+Multan
+Pretoria
+Bristol
+Jaipur
+Canberra
+Durham
+Kimberly
+Cairns
+Kuala Lumpur
+Grenada
+Invercargill
+Belfast
+East London
+Gold Coast
+Southampton
+Port Moresby
+Dambulla
+Leicester
+Bermuda
+Miami
+Townsville
+Alice Springs
+Worcester
+Kathmandu
+Darwin
+St Lucia
+Newcastle
+Pune
+Copenhagen
+Canterbury
+Shanghai
+Queenstown
+Kampala
+Seoul
+Chicago
+Paris
+Derby
+Mexico City
+Chelmsford
+Vancouver
+Taunton
+Berlin
+Sylhet
+Surat
+Sao Paulo
+Buenos Aires
+Northampton
+Beijing
+Hove
+St Vincent
+Rome
+Palmerston North
+Lucknow
+Jakarta
+St Kitts
+Montego Bay
+Milan
+Dominica
+Houston
+Bay of Plenty
+Barcelona
+Wollongong
+Kandahar
+Liverpool
+Geelong
+Ballarat
+New Plymouth
+Launceston
+Suva
+Bangkok
+Manila
+Taipei
+Kochi
+Chandigarh
+Mysore
+Jaffna
+Thimpu
+Quetta
+Bahawalpur
+Muscat
+Bahrain
+Qatar
+Kuwait
+Cairo
+Jerusalem
+Athens
+Istanbul
+Bucharest
+Moscow
+Vienna
+Monaco
+Cambridge
+Oxford
+Exeter
+Glasgow
+Aberdeen
+Cork
+Montreal
+Philadelphia
+Washington
+Atlanta
+San Francisco
+Seattle
+New Orleans
+Las Vegas
+San Juan
+Santo Domingo
+Tobago
+Bogota
+Rio de Janeiro
+Gaborone
+Polokwane
+Pietermaritzburg
+Mutare
+Mombase
+Lagos
+Casablanca
+Spanish Town
+Norwich
+Macau
+Osaka
+Nelson
+Whangarei
+Bendingo
+Nagpur
+Madurai
+Visakhapatnam
+Patna
+Kanpur
+Khulna
+Cox's Bazar
+Indore
+Madrid
+Prague
+Warsaw
+Munich
+Stockholm
+Potchefstroom
+Wagga Wagga
+Bundaberg
+Sheffield
+Swansea
+Lincoln
+Limerick
+Blackpool
+Zagreb
+Belgrade
+Naples
+Beirut
+Budapest
+Tblisi
+Hanoi
+Chengdu
+Busan
+Kyoto
+Yokohama
+Mackay
+Sunshine Coast
+Gisbourne
+Tonga
+Samoa
+Honolulu
+Dallas
+San Diego
+St Louis
+Detroit
+Denver
+Monterrey
+Aruba
+Curacao
+Montserrat
+Lima
+Montevideo
+Accra
+Dakar
+Lisbon
+Hamburg
+Frankfurt
+Brussels
+Hull
+Peterborough
+Waterford
+Oslo
+Helsinki
+Amman
+Tel-Aviv
+Middlesborough
+Colwyn Bay
+Riyadh
+Tehran
+Baghdad
+Brooklyn
+Bowral

@@ -5,6 +5,9 @@ nations = ['england', 'australia', 'southafrica', 'westindies', 'newzealand', 'i
 h = open ('alldata.txt','w')
 h.close()
 
+g = open('dob.txt','w')
+g.close()
+
 for i in nations:
     country = i
 
@@ -35,6 +38,7 @@ for i in nations:
             #print (x)
     ERYears.append(['2018','3.11'])
     ERYears.append(['2019','3.11'])
+    ERYears.append(['2020','3.11'])
 
     Averages = []
     MidYear = []
@@ -42,7 +46,7 @@ for i in nations:
     Players = []
     AllData = []
 
-    for i in range (0, 143):
+    for i in range (0, 144):
         Years[i][0] = int(Years[i][0])
         Years[i][1] = float(Years[i][1])
         ERYears[i][0] = float(ERYears[i][0])
@@ -57,8 +61,11 @@ for i in nations:
         print (Set)
         Set[0] = Set[0][1:-1]
         Set[1] = Set[1][2:-1]
-        for j in range (2, 19):
-            Set[j] = Set[j].strip()
+        for j in range (2, 20):
+            try:
+                Set[j] = Set[j].strip()
+            except:
+                Set.append(0)
             try:
                 Set[j] = int(Set[j])
             except:
@@ -91,15 +98,23 @@ for i in nations:
         FCBatAv = Set[13]
         FCWickets = Set[14]
         FCBowlAv = Set[15]
-        CaptGames = Set[16]
-        WKGames = Set[17]
-        OpenInns = Set[18]
+        CaptGames = Set[17]
+        WKGames = Set[18]
+        OpenInns = Set[19]
+
+        g = open('dob.txt','a')
+        dobstats = [Set[0], Set[9], Set[16]]
+        print (dobstats)
+        g.write (str(dobstats))
+        g.write('\n')
 
         FCBatAv = min(FCBatAv, 50)
         if AvYear > 1900:
             FCBowlAv = max (FCBowlAv, 23)
         else:
             FCBowlAv = max (FCBowlAv, 13)
+
+        print (Set)
         
         GameData.append(Set[0])
 
@@ -159,8 +174,8 @@ for i in nations:
         if BallsBowled > 10000:
             AdjustedBowlAv = RawBowlAv
         EraAdjustedBowlAv = (30/EraAv) * AdjustedBowlAv
-        if EraAdjustedBowlAv > 500:
-            EraAdjustedBowlAv = 500
+        if EraAdjustedBowlAv > 100:
+            EraAdjustedBowlAv = 100
         EraAdjustedBowlAv = round(EraAdjustedBowlAv, 2)
         GameData.append(EraAdjustedBowlAv)
 
@@ -187,10 +202,14 @@ for i in nations:
         if OpenInns > 50 or (OpenInns/Tests > 0.8):
             Role = 'Open' + Role
 
-        try:
-            BatRunsPerBall = (Runs/BallsFaced)
-        except:
+        if BallsFaced > 60:
+            BatRunsPerBall = (Runs/BallsFaced)*2
+        else:
+            BatRunsPerBall = 1
+        if BatRunsPerBall < 0.5:
             BatRunsPerBall = 0.5
+        if BatRunsPerBall > 2:
+            BatRunsPerBall = 2
 
         try:
             BowlER = (RunsAllowed/BallsBowled) / (float(EconAv)/6)

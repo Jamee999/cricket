@@ -4,7 +4,7 @@ import re
 import datetime
 
 CurrentTime = datetime.datetime.now()
-CurrentYear = CurrentYear.year
+CurrentYear = CurrentTime.year
 
 def get_num(x):
     return int(''.join(ele for ele in x if ele.isdigit()))

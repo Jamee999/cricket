@@ -25,7 +25,7 @@ def userselection (t, p):
 		c = [x for x in p if quickorder(x.tag) == i]
 		n = 0
 		if i < 3: c.sort(key = lambda x: x.bat, reverse = True)
-		else: c.sort (key = lambda x: x.bat + 2.5*(45-x.bowl), reverse = True)
+		else: c.sort (key = lambda x: x.bat + 2*(45-x.bowl), reverse = True)
 
 		while len(c) > 0 and n < 6:
 			s.append(c[0])
@@ -53,6 +53,7 @@ def selection (t, p, u):
 	if u != t:
 		for i in p:
 			if i.name == 'DG Bradman': 
+				i.team = t.name
 				t.squad.remove(1)
 				t.active.append(i)
 				p.remove(i)
@@ -69,7 +70,7 @@ def selection (t, p, u):
 
 		if n < 3: a.sort(key = lambda x: x.bat + 5*random.random(), reverse = True)
 		elif 3 <= n <= 5: a.sort(key = lambda x: x.bowl + 5*random.random(), reverse = False)
-		else: a.sort(key = lambda x: x.bat + max(0, 45-x.bowl)*2.5 + 5*random.random(), reverse = True)
+		else: a.sort(key = lambda x: x.bat + max(0, 45-x.bowl)*2 + 5*random.random(), reverse = True)
 
 		if len(t.squad) > 0: t.squad.remove(n)
 		a[0].team = t.name

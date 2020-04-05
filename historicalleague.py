@@ -17,7 +17,15 @@ if __name__ == '__main__':
 	for i in range (x):
 		[a,b] = HistoricalYearsSelect(a, b)
 		z = CountrySelect(a,b)
-		t.append(setup(z))
+		c = setup(z)
+
+		for j in t:
+			if c.name == j.name:
+				c.name = '{} {}'.format(c.name, a)
+				for k in c.active:
+					k.team = c.name
+
+		t.append(c)
 		y = a
 
 	n = gamenumber ()

@@ -20,7 +20,9 @@ def HistoricalYearsSelect (x,y):
 			b = int(x[1])
 			if a not in Years or b not in Years:
 				a = 0
-		else: a, b = int(a), int(a)
+		else: 
+			try: a, b = int(a), int(a)
+			except: a, b = 2, 2
 
 	return [a,b]
 

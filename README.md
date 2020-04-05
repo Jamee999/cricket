@@ -8,7 +8,7 @@ List of the different programs that can be run:
 
 altcricket.py - Simulate the entire history of Test match cricket, with a number of different alternate historical options.
 
-custom.py - Run a game or series of games beteween custom teams. The teams can be loaded from a textfile, or created using the database of real players.
+custom.py - Run a game or series of games between custom teams. The teams can be loaded from a textfile, or created using the database of real players.
 
 customleague.py - Run a round-robin league between a number of custom teams.
 

@@ -904,11 +904,10 @@ def select (a): #team
 			o.remove(x)
 		if random.random() < 0.5: l = []
 
-
 	o = [x for x in a.xi if quickorder (x.tag) == 4]
 	p = [x for x in a.squad if quickorder(x.tag) == 3 and x not in a.xi and x not in a.inj and x not in a.unav]
 	p.sort(key = lambda x: value (x, 3), reverse = True)
-	if len(o) > 1 and len (p) > 0 and PaceFactor/SpinFactor < 0.95 and current > 1945:
+	if len(o) > 1 and len (p) > 0 and PaceFactor/SpinFactor < 1.05 and current > 1945:
 		o.sort(key = lambda x: value (x, 4))
 		a.xi.remove(o[0])
 		a.xi.append(p[0])
@@ -988,7 +987,7 @@ def bowldesc (x):
 def shortbowldesc (x):
 	if x.BBR == float('inf'): BB = '-'.center(6)
 	else: BB = str(x.BBW).rjust(2) + '-' + str(x.BBR).ljust(3)
-	print ('{} wickets @{} {}x5w {}x10w BB{} SR{} ER {} Rating{} {}'.format(str(x.wickets).rjust(3), "{:0.2f}".format(x.bowlav).rjust(6), str(x.fives).rjust(2), str(x.tens).rjust(2), BB, "{:0.1f}".format(x.bowlsr).rjust(5), "{:0.2f}".format(x.bowler).rjust(4), "{:0.2f}".format(x.bowlform).rjust(6), round(value (x, quickorder(x.tag)))), end = '')
+	print ('{} wickets @{} {}x5w {}x10w BB{} SR{} ER {} Rating{}'.format(str(x.wickets).rjust(3), "{:0.2f}".format(x.bowlav).rjust(6), str(x.fives).rjust(2), str(x.tens).rjust(2), BB, "{:0.1f}".format(x.bowlsr).rjust(5), "{:0.2f}".format(x.bowler).rjust(4), "{:0.2f}".format(x.bowlform).rjust(6), ), end = '')
 
 def longdesc (x):
 	print (x.name.ljust(20), end = ' ')
@@ -1030,6 +1029,17 @@ def weathercheck (s, g):
 
 	return Weather
 
+def modcheck (t, s):
+	for i in t.xi:
+		i.mod = 1
+		if i in t.inj:
+			i.mod = 0.8
+		if t == s.away:
+			i.mod = i.mod*0.95 
+
+	return t
+
+
 def game (s, g):
 	global pause, PaceFactor, SpinFactor, inns, bowls
 	import callcricketnew as cricket
@@ -1050,6 +1060,7 @@ def game (s, g):
 
 		i.gamecapt = x
 		i.wk = showteam(i)
+		i = modcheck (i, s)
 
 	allplayers = [*s.home.xi, *s.away.xi]
 	print ()
@@ -1661,8 +1672,8 @@ def summary (teams, allplayers, inns, bowls):
 	print ()
 
 	allplayers.sort(key = lambda x: x.dob)
-	for i in allplayers:
-		if i.games == 0: longdesc (i)
+	#for i in allplayers:
+		#if i.games == 0: longdesc (i)
 
 	print ('All players: ', sum([x.runs for x in inns]), 'runs @',sum([x.runs for x in inns])/sum([x.out for x in inns]))
 	print ()

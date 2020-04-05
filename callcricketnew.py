@@ -3,7 +3,7 @@ import random, shutil, datetime, math
 def listshow (x):
 	a = ''
 	for i in x:
-		if i != x[-1]: a = a + '{}, '.format(i)
+		if i is not x[-1]: a = a + '{}, '.format(i)
 		else: a = a + '{}'.format(i)
 	return a
 
@@ -202,9 +202,9 @@ class teaminnings:
 
 	def bowlchange (self):
 		if 'Fast' in self.bowler.tag:
-			x =  self.fatigue.count(self.bowler)*3 + self.bowler.bowling.spell - 7*self.bowler.bowling.wickets + excessrpo(self.bowler.bowling)
+			x =  self.fatigue.count(self.bowler)*3 + self.bowler.bowling.spell*1.5 - 5*self.bowler.bowling.wickets + excessrpo(self.bowler.bowling)
 		else:
-			x = self.fatigue.count(self.bowler) + self.bowler.bowling.spell - 7*self.bowler.bowling.wickets + excessrpo(self.bowler.bowling)
+			x = self.fatigue.count(self.bowler) + self.bowler.bowling.spell*1.5 - 5*self.bowler.bowling.wickets + excessrpo(self.bowler.bowling)
 		if 'Part' in self.bowler.tag: x = x+2
 		elif 'Bat' in self.bowler.tag or 'WK' in self.bowler.tag: x = x+3
 		if 'Fast' in self.bowler.tag: x = 1.5*x
@@ -231,23 +231,23 @@ class teaminnings:
 		o = self.overs % 80
 		t = quickorder(p.tag)
 
-		x = p.bowl + excessrpo(p.bowling) - 7*p.bowling.wickets
+		x = p.bowl*0.5 + excessrpo(p.bowling) - 5*p.bowling.wickets
 
 		if 'Fast' in p.tag:
 			x = x + self.fatigue.count(p)**2
 		else:
 			x = x + 0.5*self.fatigue.count(p)**2 
 
-		if 'Part' in p.tag: x = x + 50
-		if 'Bat' in p.tag: x = x + 100
+		if 'Part' in p.tag: x = x + 35
+		if 'Bat' in p.tag: x = x + 70
 		if 'WK' in p.tag: x = x + 100
 		if o < 15 and 'Spin' in p.tag: x = x + 50
 		elif o < 25 and 'Spin' in p.tag: x = x + 25
 		if self.overs < 50 and t < 3: x = x + 50
-		if self.partnership(0) > 150 and t < 3: x + x - 20
+		if self.partnership(0) > 150 and t < 3: x + x - 50
 		if t == 4: x = x * self.det() * self.test.pitch[1]
 		else: x = x * self.test.pitch[0]
-		if self.wickets > 7 and t > 2: x = x + 50
+		if self.wickets > 7 and t < 3: x = x + 50
 
 		x = x - 50*random.random()
 
@@ -286,8 +286,8 @@ class teaminnings:
 		return x
 
 	def wicketrate (self):
-		y = 1
-		if 'WK' not in self.bowlteam.wk.tag: y = 0.8
+		y = 1 * self.bowler.mod / self.onstrike.mod
+		if 'WK' not in self.bowlteam.wk.tag: y = y * 0.8
 
 		y = y * (self.test.rpo/self.test.base) * (1/6)
 		y = y * self.aggfactor() * max (1, self.aggfactor()**2)
@@ -301,7 +301,7 @@ class teaminnings:
 		return y
 
 	def rate (self):
-		y = self.test.rpo/6
+		y = self.test.rpo/6 * self.onstrike.mod / self.bowler.mod
 		y = y * self.aggfactor()
 		y = y * (self.onstrike.bat/30)**0.2
 		y = y * (self.bowler.bowl/30)**0.5
@@ -1084,7 +1084,7 @@ class innings:
 		p.inns.append(self)
 
 	def form (self):
-		if self.test.overcount() % 90 < 6: return 0.9
+		if self.test.overcount() % 90 < 6 or self.test.teaminnings[-1].overs < 10 and 'Open' not in self.player.tag: return 0.9
 		else: return 0.9 + min(0.1, self.balls/500) + min(0.1, self.runs/250) - min (0, (200-self.balls)/2000)
 
 	def stats (self):
@@ -1231,6 +1231,7 @@ class player:
 	sr = 0
 	er = 0
 	capt = 0
+	mod = 1
 
 	inns = []
 	bowls = []

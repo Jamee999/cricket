@@ -56,7 +56,7 @@ def league (t, n):
 	print ()
 	s.players.sort(key = lambda x: x.wickets, reverse = True)
 	for i in s.players:
-		if (i.bowl < 25 and i.wickets > 10) or i in s.players[:10]:
+		if (i.bowlav < 25 and i.wickets > 10) or i in s.players[:10]:
 			print ('{} ({}) {} wickets @ {}'.format(i.name, i.team, i.wickets, i.bowlav), end = ', ')
 
 	s.players.sort(key = lambda x: 20*x.wickets + x.runs + 100*[a[1] for a in log if a[0] == x.team][0], reverse = True)

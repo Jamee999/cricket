@@ -7,7 +7,7 @@ def HistoricalYearsSelect (x,y):
 	a, b = 1,1
 	CurrentYear = datetime.datetime.now().year
 	valid = 0
-	Years = [x for x in range (1877, CurrentYear+1) if x < 1914 or x > 1946 or 1919 < x < 1939] #Defines acceptable years
+	Years = [z for  z in range (1877, CurrentYear+1) if z < 1914 or z > 1946 or (1919 < z < 1939)] #Defines acceptable years
 	while a not in Years + ['all', 'random', 'same']: #loops until given acceptable answer
 		if a != 1 and b != 1: print ('Invalid input.')
 		a, b = 0, 0
@@ -20,44 +20,45 @@ def HistoricalYearsSelect (x,y):
 			b = int(x[1])
 			if a not in Years or b not in Years:
 				a = 0
-		else: a = int(a)
+		else: a, b = int(a), int(a)
 
-	if b < 2: return [a,a]
-	else: return [a,b]
+	return [a,b]
 
 def CountrySelect(x,y, *Team1Name):
-    x = int(x)
-    y = int(y)
-    z = ''
-    Teams = ['England', 'Australia', 'South Africa', 'West Indies', 'New Zealand', 'India', 'Pakistan', 'Sri Lanka', 'Zimbabwe', 'Bangladesh', 'Ireland', 'Afghanistan', 'random', 'all']
-    if y < 2018:
-        Teams.remove('Ireland')
-        Teams.remove('Afghanistan')
-    if y < 2000: #remove teams from ineligible years.
-        Teams.remove('Bangladesh')
-    if y < 1992:
-        Teams.remove('Zimbabwe')
-    if y < 1982:
-        Teams.remove('Sri Lanka')
-    if y < 1952:
-        Teams.remove('Pakistan')
-    if y < 1932:
-        Teams.remove('India')
-    if y < 1930:
-        Teams.remove('New Zealand')
-    if y < 1928:
-        Teams.remove('West Indies')
-    if y < 1889 or (x > 1970 and y < 1992):
-        Teams.remove('South Africa')
+	x = int(x)
+	y = int(y)
+	z = ''
+	Teams = ['England', 'Australia', 'South Africa', 'West Indies', 'New Zealand', 'India', 'Pakistan', 'Sri Lanka', 'Zimbabwe', 'Bangladesh', 'Ireland', 'Afghanistan', 'random', 'all']
+	if x == 1877 and y >= 2020: pass
+	else:
+		if y < 2018:
+		    Teams.remove('Ireland')
+		    Teams.remove('Afghanistan')
+		if y < 2000: #remove teams from ineligible years.
+		    Teams.remove('Bangladesh')
+		if y < 1992:
+		    Teams.remove('Zimbabwe')
+		if y < 1982:
+		    Teams.remove('Sri Lanka')
+		if y < 1952:
+		    Teams.remove('Pakistan')
+		if y < 1932:
+		    Teams.remove('India')
+		if y < 1930:
+		    Teams.remove('New Zealand')
+		if y < 1928:
+		    Teams.remove('West Indies')
+		if y < 1889 or (x > 1970 and y < 1992):
+		    Teams.remove('South Africa')
 
-    while z not in Teams:
-    	z = str( input ('Select a team. The options are ' + listshow(Teams) + ": "))
-    	if z == 'random':
-    		z = random.choice([x for x in teams if x not in ['random','all']])
-    	if z not in Teams: print ('Invalid selection.')
-    print (z)
-    print ()
-    return z
+	while z not in Teams:
+		z = str( input ('Select a team. The options are ' + listshow(Teams) + ": "))
+		if z == 'random':
+			z = random.choice([x for x in Teams if x not in ['random','all']])
+		if z not in Teams: print ('Invalid selection.')
+	print (z)
+	print ()
+	return z
 
 def histplayers (t, y, z):
 	pickle_in = open("players","rb")

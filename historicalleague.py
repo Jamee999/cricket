@@ -13,9 +13,9 @@ if __name__ == '__main__':
 
 	x = teamnumber ()
 	t = []
-	y = 2020
+	a, b = 2020, 2020
 	for i in range (x):
-		[a,b] = HistoricalYearsSelect(y, y)
+		[a,b] = HistoricalYearsSelect(a, b)
 		z = CountrySelect(a,b)
 		t.append(setup(z))
 		y = a

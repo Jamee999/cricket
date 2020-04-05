@@ -1,35 +1,19 @@
-# cricket
 Test match cricket simulator
-Python program takes user inputs for years and teams and simulates a Test match, then outputs a scorecard.txt file.
 
-How to run:
+How to run: Download all the files, and then direct your command line to the folder where the files were downloaded. You may need to download python from https://www.python.org/ first, in order to make it work.
 
-download all the files in the /cricket branch.
+There are several different programs inside the folder. To run them, you will need to enter the name of the file in the command line (eg. historical.py), or possibly 'python3' and then the name of the file (eg. python3 historical.py) depending on your operating system.
 
-direct your command line to the folder where the files were downloaded
+List of the different programs that can be run:
 
-to play a single game:
+altcricket.py - Simulate the entire history of Test match cricket, with a number of different alternate historical options.
 
-type python3 cricket.py and follow the instructions on-screen
+custom.py - Run a game or series of games beteween custom teams. The teams can be loaded from a textfile, or created using the database of real players.
 
-if this doesn't work, you may need to download python from https://www.python.org/
+customleague.py - Run a round-robin league between a number of custom teams.
 
-to sim a series of games between two teams:
+draft.py - Draft a team and the program will simulate a league. You can also have the computer draft all the teams.
 
-type python3 series.py for historical (including all-time) teams
+historical.py - Run a game or series of games between historical or all-time teams. 
 
-type python3 customseries.py for custom teams
-
-
-to simulate a league between a series of teams:
-
-type python3 league.py for historical (including all-time) teams
-
-type python3 customleague.py for custom teams
-
-
-to set up a tournament betweeen teams that will be drafted:
-
-type python3 draft.py
-
-if you downloaded a previous version of the sim, you need to redownload all the files in the branch, as the data files have changed.
+historicalleague.py - Run a round-robin league between a number of historical or all-time teams.

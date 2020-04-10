@@ -103,16 +103,16 @@ def conditions (Weather):
     if Weather == 'Timeless': GameOvers = random.randrange(550,1000)
 
     elif Weather in ['England','New Zealand','Ireland']:
-        if random.random() < 0.1: GameOvers = random.randrange(50,450)
-        elif random.random() < 0.25: GameOvers = random.randrange(300,450)
+        if random.random() < 0.1: GameOvers = 450*(1-(random.random()*random.random()))
+        elif random.random() < 0.25: GameOvers = random.randrange(350,450)
 
     elif Weather in ['Australia','India','Pakistan','Afghanistan','Zimbabwe']:
-        if random.random() < 0.01: GameOvers = random.randrange(50,450)
-        elif random.random() < 0.1: GameOvers = random.randrange(300,450)
+        if random.random() < 0.01: GameOvers = 450*(1-(random.random()*random.random()))
+        elif random.random() < 0.1: GameOvers = random.randrange(350,450)
 
     elif Weather in ['South Africa','New Zealand','Sri Lanka','Bangladesh']:
-        if random.random() < 0.03: GameOvers = random.randrange(50,450)
-        elif random.random() < 0.15: GameOvers = random.randrange(300,450)
+        if random.random() < 0.03: GameOvers = 450*(1-(random.random()*random.random()))
+        elif random.random() < 0.15: GameOvers = random.randrange(350,450)
 
     return GameOvers
 
@@ -177,6 +177,8 @@ class teaminnings:
 			i.bowling = bowling (i, self.test)
 			i.bowling.opposition = self.team
 
+		if len(self.test.teaminnings) > 1: self.test.logger('Start of innings')
+
 		while self.wickets < 10 and self.active == True:
 			self.test.raincheck()
 			self.over()
@@ -211,7 +213,7 @@ class teaminnings:
 		if x < 1: x = 1
 		x = x**2
 
-		if self.overs < 2: x = 0
+		if self.overs < 5: x = 0
 		elif self.overs % 80 < 2: x = 100
 
 		if random.random() < x/100: 
@@ -238,8 +240,8 @@ class teaminnings:
 		else:
 			x = x + 0.5*self.fatigue.count(p)**2 
 
-		if 'Part' in p.tag: x = x + 35
-		if 'Bat' in p.tag: x = x + 70
+		if 'Part' in p.tag: x = x + 25
+		if 'Bat' in p.tag: x = x + 50
 		if 'WK' in p.tag: x = x + 100
 		if o < 15 and 'Spin' in p.tag: x = x + 50
 		elif o < 25 and 'Spin' in p.tag: x = x + 25
@@ -270,13 +272,15 @@ class teaminnings:
 			if self.runs > 400: x =  x + (self.runs-400)/1000
 			if self.wickets > 1 and self.runs/self.wickets < 15: x = x - 0.2
 
+		if len(self.test.teaminnings) == 3 and self.lead() > 200 and self.wickets < 7: x = x + (self.lead()-200)/1000
+
 		elif len(self.test.teaminnings) == 4 and self.test.remaining() > 0:
 			y = self.target() - self.runs
 			r = y / self.test.remaining()
 			z = 10 - self.wickets
 
 			if 6 > r > 3 and z > 4 and self.test.remaining() < 50:
-				x = x + (r-3)/10
+				x = x + (r-2)/10
 			if r > 4 and z <= 4:
 				x = x - 0.2
 
@@ -349,7 +353,7 @@ class teaminnings:
 			if self.wickets != 10: x = ' - new batsman {}'.format(self.team.xi[self.wickets+1].name)
 			else: x = ''
 			self.test.logger('{} {} {} ({}b) {}x4 {}x6 - partnership {} {}'.format(self.onstrike.name, self.onstrike.innings.dismissal, self.onstrike.innings.runs, self.onstrike.innings.balls, self.onstrike.innings.fours, self.onstrike.innings.sixes, self.partnership(0), x))
-		if self.bowler.bowling.wickets >= 5:
+		if self.bowler.bowling.wickets >= 5 and 'run out' not in self.onstrike.innings.dismissal:
 			self.test.logger('{} {}'.format(self.bowler.name, self.bowler.bowling.bowlformat()))
 
 		self.onstrike.innings.FOW = [self.onstrike, self.runs,self.wickets]
@@ -535,8 +539,11 @@ class teaminnings:
 
 	def milestone (self, n):
 		x = self.onstrike.innings.runs-n
+
 		if x % 50 > 10 and self.onstrike.innings.runs % 50 <= n:
 			self.test.logger('{} {}* ({}b) {}x4 {}x6'.format(self.onstrike.name, self.onstrike.innings.runs, self.onstrike.innings.balls, self.onstrike.innings.fours, self.onstrike.innings.sixes))
+		if self.runs % 50 < n and n != 0 and self.runs >= 50:
+			self.test.logger('{} {}* ({}b), {} {}* ({}b).'.format(self.batsmen[0].name, self.batsmen[0].innings.runs, self.batsmen[0].innings.balls, self.batsmen[1].name, self.batsmen[1].innings.runs, self.batsmen[1].innings.balls))
 
 	def partnership (self, n):
 		try: a = max([x.FOW[1] for x in self.innings if x.FOW is not ''])
@@ -557,7 +564,7 @@ class teaminnings:
 			self.declare = True
 		if len(self.test.teaminnings) == 2 and (self.runs/self.test.teaminnings[0].runs > 2) and self.overs > 100 and random.random() < 0.01:
 			self.declare = True
-		if len(self.test.teaminnings) == 3 and self.lead() > (self.test.remaining()*self.test.rpo + 50) and self.test.remaining() > 35:
+		if len(self.test.teaminnings) == 3 and self.lead() > (self.test.remaining()*self.test.rpo + 100) and self.test.remaining() > 35:
 			self.declare = True
 			
 
@@ -650,10 +657,17 @@ class teaminnings:
 			i.bowling.stats()
 			if i.bowling.overs == 0 and i.bowling.balls == 0:
 				continue
+			if i.bowling.balls > 0: 
+				o = i.bowling.overs + i.bowling.balls/6
+			else: o = i.bowling.overs
+
+			if o > 0: e = "%.2f" % round(i.bowling.runs/o,2)
+			else: e = "----" 
+
 			if self.test.fullcard == True:
-				y = ' {} {} - {} - {} - {} {} {} {}'.format(i.name.ljust(20), oversballs(i.bowling).center(4), str(i.bowling.maidens).rjust(2), str(i.bowling.runs).rjust(3), str(i.bowling.wickets).rjust(2),i.bowling.player.tag.center(20), ''.ljust(34),i.bowldesc(self.test.year))
+				y = ' {} {} - {} - {} - {}   {} RPO {} {} {}'.format(i.name.ljust(20), oversballs(i.bowling).center(4), str(i.bowling.maidens).rjust(2), str(i.bowling.runs).rjust(3), str(i.bowling.wickets).rjust(2), str(e), i.bowling.player.tag.center(15), ''.ljust(28),i.bowldesc(self.test.year))
 			else:
-				y = ' {} {} - {} - {} - {} {}'.format(i.name.ljust(20), oversballs(i.bowling).center(4), str(i.bowling.maidens).rjust(2), str(i.bowling.runs).rjust(3), str(i.bowling.wickets).rjust(2),i.bowling.player.tag.center(20))
+				y = ' {} {} - {} - {} - {}   {} RPO {}'.format(i.name.ljust(20), oversballs(i.bowling).center(4), str(i.bowling.maidens).rjust(2), str(i.bowling.runs).rjust(3), str(i.bowling.wickets).rjust(2), str(e), i.bowling.player.tag.center(15))
 			self.test.score (y)
 
 	def followon (self):
@@ -712,7 +726,19 @@ class teaminnings:
 		self.test.score(x)
 
 		self.test.motmpick()
-		self.test.score(' Man of the Match: {} ({})'.format(self.test.motm.name, self.test.motm.team))
+
+		x = []
+
+		for i in self.test.inns:
+			if i.player == self.test.motm and i.balls > 0: 
+				if i.out == True: y = ''
+				else: y = '*'
+				x.append('{}{}'.format(i.runs, y))
+		for i in self.test.bowls:
+			if i.player == self.test.motm and ((i.balls > 0) or (i.overs > 0)):
+				x.append('{}-{}'.format(i.wickets, i.runs))
+
+		self.test.score(' Man of the Match: {} ({}) ({})'.format(self.test.motm.name, self.test.motm.team,listshow(x)))
 		if self.test.lostovers > 0:
 			self.test.score(' {} overs lost to bad weather.'.format(self.test.lostovers))
 		self.test.score(' Pace Factor: {}, Spin Factor: {}'.format(round(self.test.pitch[0],2), round(self.test.pitch[1]),2))
@@ -720,6 +746,8 @@ class teaminnings:
 		self.test.logprint()
 
 		#####ONLY SAVE SCORECARDS FROM THIS POINT ON ######
+
+		if self.test.saveallcards == True: self.test.cardsave()
 
 		if len(test.teaminnings) == 4:
 			if self.test.win == self.test.teaminnings[1].team == self.test.teaminnings[2].team: self.test.cardsave()
@@ -857,6 +885,7 @@ class test:
 			x = min (x, self.remaining())
 			if x > 0:
 				self.logger('{} overs lost due to bad weather.'.format(x))
+				self.logger('')
 
 				n = 90
 				while n < self.overcount() + self.lostovers:
@@ -918,7 +947,10 @@ class test:
 			for i in self.log:
 				b = i[1]
 				z = '{} {} {}'.format(b,str(i[2] + i[3]).ljust(45), i[0])
-				if 'Day ' in i[0]:
+				if i[0] == '':
+					f.write('\n')
+					print ()
+				elif 'Day ' in i[0]:
 					f.write('\n')
 					print ()
 					f.write(str(i[0]))
@@ -1068,6 +1100,7 @@ class test:
 	scorecard = 'scorecard.txt'
 	card = []
 	fullcard = False
+	saveallcards = False
 	log = []
 	teaminnings = []
 	players = ''

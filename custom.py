@@ -1,4 +1,4 @@
-import random, pexpect, time, copy, os, shutil, datetime
+import random, time, copy, os, shutil, datetime
 from callcricketnew import test, innings, bowling, player, team, quickorder, listshow, playerwrite
 from game import game, setup
 from historical import series

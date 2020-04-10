@@ -15,6 +15,7 @@ def setup(home, away):
 	t.raw = [t.year, t.home.name, t.away.name, "Lord's",'', '','','','']
 	t.series = seri()
 	t.folder = 'scorecards'
+	t.saveallcards = True
 	return t
 
 def firstxi (x):
@@ -28,7 +29,7 @@ def firstxi (x):
 		n = quickorder(i.tag)
 		roles[n].append(i)
 
-	k.sort(key = lambda x: x.bat, reverse = True)
+	k.sort(key = lambda x: x.bat + 5*random.random(), reverse = True)
 	if len(k) > 0:
 		xi.append(k[0])
 	elif len(b) > 0:
@@ -36,31 +37,31 @@ def firstxi (x):
 		xi.append(z)
 		b.remove(z)
 
-	o.sort(key = lambda x:  x.bat, reverse = True)
+	o.sort(key = lambda x:  x.bat+ 5*random.random(), reverse = True)
 	while len(o) > 0 and len(xi) < 3:
 		xi.append(o[0])
 		o.pop(0)
 
-	f.sort(key = lambda x: x.bowl, reverse = False)
+	f.sort(key = lambda x: x.bowl+ 5*random.random(), reverse = False)
 	while len (f) > 0 and len(xi) < 5:
 		xi.append(f[0])
 		f.pop(0)
 
 	c = f+s
-	c.sort(key = lambda x: x.bowl, reverse = False)
+	c.sort(key = lambda x: x.bowl+ 5*random.random(), reverse = False)
 	while len (c) > 0 and len(xi) < 7:
 		xi.append(c[0])
 		c.pop(0)
 
 	a = [x for x in pool if x not in xi]
 
-	a.sort(key = lambda x:x.bat, reverse = True)
+	a.sort(key = lambda x:x.bat+ 5*random.random(), reverse = True)
 	while len (a) > 0 and len(xi) < 10:
 		xi.append(a[0])
 		a.pop(0)
 
 	while len(a) > 0 and len(xi) < 11:
-		if len([x for x in xi if x.bat < 20 and quickorder(x.tag) > 1]) >= 4: a.sort(key = lambda x: x.bat/2 + max(0, 45-x.bowl), reverse = True)
+		if len([x for x in xi if x.bat < 20 and quickorder(x.tag) > 1]) >= 4: a.sort(key = lambda x: x.bat/2 + max(0, 45-x.bowl)+ 5*random.random(), reverse = True)
 		else: a.sort(key = lambda x: x.bat, reverse = True)
 		xi.append(a[0])
 		a.pop(0)

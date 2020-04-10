@@ -1,7 +1,7 @@
 from callcricketnew import test, innings, bowling, player, team, quickorder, listshow, playerwrite
 from game import game, setup
 from altcricket import seri
-import pickle, datetime, random, copy
+import pickle, datetime, random, copy, os
 
 def HistoricalYearsSelect (x,y):
 	a, b = 1,1
@@ -71,6 +71,11 @@ def histplayers (t, y, z):
 	return p
 
 def series (home, away, homeplayers, awayplayers):
+	folder = 'scorecards'
+	if not os.path.exists(folder): os.makedirs(folder)
+	fileList = os.listdir(folder)
+	for fileName in fileList: os.remove("{}/{}".format(folder,fileName))
+
 	n = 0
 	while n > 1000 or n < 1:
 		n = input('Enter number of games to be played: ')
@@ -86,6 +91,7 @@ def series (home, away, homeplayers, awayplayers):
 		g.year = 2020
 		g.home.active = homeplayers
 		g.away.active = awayplayers
+		g.no = i+1
 		s.games.append(g)
 
 	s.home = g.home

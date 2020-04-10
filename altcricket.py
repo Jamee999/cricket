@@ -103,7 +103,7 @@ def scenario (t, m):
 		for x in t:
 			x.players = [y for y in allplayers if y.team == x.name]
 
-	elif m == 'h' or m == 's': 
+	elif m in ['h','s','t']: 
 		for x in t:
 			for y in x.players: allplayers.append(y)
 
@@ -139,7 +139,7 @@ def scenario (t, m):
 		min = i.players[0].first
 		for y in i.players:
 
-			if m not in ['h', 's']: 
+			if m not in ['h', 's', 't']: 
 				y.dob = y.first - random.randrange(18,25)
 
 				if y.first - y.dob < 23: y.dob = y.dob - random.randrange(0,3)
@@ -186,6 +186,30 @@ def scenario (t, m):
 
 
 			if y.last - y.first < 10: y.last = y.first + 10
+
+	switch = []
+	if m == 't':
+		q = open('switch.txt', 'r')
+		for line in q:
+			line = line.split(',')
+			switch.append(line)
+		q.close()
+		print (switch)
+
+		for i in switch:
+			for j in t:
+				z = [x for x in j.players if x.name == i[0]]
+				if len (z) > 0: 
+					y = z[0]
+					j.players.remove(y)
+					y.team = i[1].strip()
+			for k in t:
+				if k.name == y.team:
+					k.players.append(y)
+					break
+			if len(i) == 4:
+				i.first = int(i[2])
+				i.last = int(i[3])
 
 	for i in allplayers:
 		q = [x for x in allplayers if i.name == x.name and i.realfirst == x.realfirst and i is not x]
@@ -255,7 +279,7 @@ def setup (x):
 
 
 def quicksort (x):
-	x.sort(key = lambda x: 10000*quickorder(x.tag) - x.batform, reverse = False)
+	x.sort(key = lambda x: 10000*quickorder(x.tag) - x.bat - x.batform, reverse = False)
 	return x
 
 def showteam (x):
@@ -396,12 +420,14 @@ def firstxi (x):
 
 def captscore (x):
 	global current
-	z = (age(x.dob)-18)*2 + 10*random.random() + x.bat**0.5 + x.batform**0.5 + x.batav**0.5 + x.games**0.5 - x.captgames
+	z = (age(x.dob)-18)*2 + 10*random.random() + x.bat**0.5 + x.batform**0.5 + x.batav**0.5 + x.games**0.5 
+
+	if current > 1945: z = z - x.captgames
 
 	if x.capt >= 5: z = z + 10
 	elif x.capt > 0: z = z + 5
 
-	if ('Lord ' in x.name or '.' in x.name) and current < 1945: z = z**2 + 10
+	if ('Lord ' in x.name or '.' in x.name) and current < 1945: z = z**2
 	if age (x.dob) < 25 or x.games < 10: z = z/10
 	return z
 
@@ -606,11 +632,11 @@ def value (p, n):
 
 	x = x + c
 
-	y, t = 0, 200
+	y, t = 0, 250
 
 	if age(p.dob) < 25: y = y - (25-age(p.dob))
 	if p.first == current: y = y-1
-	if current < 1945: t = 400
+	if current < 1945: t = 500
 
 	while y <= p.games and (quickorder(p.tag) == n or n == 9) and p.games < 5:
 		t = t * random.random()
@@ -619,6 +645,7 @@ def value (p, n):
 		if y > p.games: x = x + t
 
 	if quickorder(p.tag) == n or n == 1 or (n == 5 and quickorder(p.tag) in [3,4]): x = x+100
+	elif n == 0: x = x + 25
 	if n == 2 and quickorder(p.tag) != 2: x = x-100
 
 	if current < 1945: x = x * (0.5 + random.random())
@@ -626,12 +653,12 @@ def value (p, n):
 	if quickorder(p.tag) == 3  and (n == 3 or n == 5): x = x * (SpinFactor/PaceFactor)
 	elif quickorder(p.tag) == 4 and (n == 4 or n == 5): x = x * (PaceFactor/SpinFactor)
 
-	if age(p.dob) > 37 and current > 1945: 
-		y = (age(p.dob)-37)
+	if age(p.dob) > 35 and current > 1945: 
+		y = (age(p.dob)-35)
 		if quickorder(p.tag) in ['Spin','OpenSpin']: y = y/2
-	elif age(p.dob) < 23: y = (23-age(p.dob))
+	#elif age(p.dob) < 25: y = (25-age(p.dob))
 	else: y = 0
-	x = x * (1 - y/20)
+	x = x - (y*10)
 
 	#print (p.name.ljust(20), round(x), n)
 
@@ -647,6 +674,7 @@ def reinforce (a, x, y, z): #x is type, y is number, z is year
 		a.squad.append(e[0])
 		print (e[0].name, 'added to', a.name, 'squad.')
 		longdesc (e[0])
+		print ()
 		e.pop(0)
 
 	return a
@@ -689,9 +717,6 @@ def injury (a):
 	for i in a.squad:
 		if i not in a.inj:
 			if random.random() < 0.05:
-				a.inj.append(i)
-				continue
-			if random.random() < 0.05 and i.tag in ['Spin', 'OpenSpin', 'Med', 'OpenMed']:
 				a.inj.append(i)
 				continue
 			if random.random() < 0.01*(age(i.dob)-30):
@@ -784,7 +809,7 @@ def resign (c, t): #captain, team
 
 	return t
 
-def select (a): #team
+def select (a, s): #team
 	global PaceFactor, SpinFactor
 	print ()
 	print (a.name)
@@ -805,10 +830,12 @@ def select (a): #team
 
 	if len(a.xi) == 0: a.xi = firstxi (a)
 
-	a = reinforce (a, 3, 2, 1945) #add fast bowlers
-	a = reinforce (a, 2, 1, 1945) #add keeper
-	a = reinforce (a, 4, 1, 1980) #add spinner
-	a = reinforce (a, 0, 2, 1980) #add openers
+	a = reinforce (a, 3, 2, 1960) #add fast bowlers
+	a = reinforce (a, 2, 1, 1960) #add keeper
+	a = reinforce (a, 4, 1, 1960) #add spinner
+	if s.home in ['India',"Pakistan",'Sri Lanka',"Bangladesh","Afghanistan"]:
+		a = reinforce (a, 4, 2, 1980)
+	a = reinforce (a, 0, 2, 1990) #add openers
 	a = reinforce (a, 3, 3, 1990) #add more fast bowlers
 
 	d = [quickorder(x.tag) for x in a.squad if x not in a.inj and x not in a.unav]
@@ -897,7 +924,7 @@ def select (a): #team
 	o.sort(key = lambda x: value (x, 2), reverse = True)
 	while len(o) > 2 and len (l) > 0:
 		x = o[-1]
-		if value(x, 1) < value(l[0], 1) and random.random() < 0.75:
+		if value(x, 1) < value(l[0], 1):
 			a.xi.remove(x)
 			a.xi.append(l[0])
 			l.pop()
@@ -936,6 +963,7 @@ def select (a): #team
 				y = [x for x in last if x not in now][j]
 				z = [x for x in now if x not in last][j]
 				print (quickdesc(y), 'replaced by', quickdesc (z))
+			print ()
 	else: a.xi = a.lastxi
 
 	for i in a.xi:
@@ -966,7 +994,13 @@ def agedesc (x):
 	print (x.age, end = ' ')
 
 def quickdesc (y):
-	x = '{} ({}, {}, {} Tests)'.format(y.name, y.tag, y.age, y.games)
+	global current
+	if y.last < current: a = ', retired'
+	else: a = ''
+
+	if y.games == 0: x = '{} ({}, {}, {} Tests{})'.format(y.name, y.tag, age(y.dob), y.games, a)
+	elif y.wickets == 0: x = '{} ({}, {}, {} Tests, {} runs @ {}{})'.format(y.name, y.tag, age(y.dob), y.games, y.runs, y.batav, a)
+	else: x = '{} ({}, {}, {} Tests, {} runs @ {}, {} wickets @ {}{})'.format(y.name, y.tag, age(y.dob), y.games, y.runs, y.batav, y.wickets, y.bowlav, a) 
 	return x
 
 def batdesc (x):
@@ -1050,7 +1084,7 @@ def game (s, g):
 	t.pitch = pitchmake (t.weather)
 
 	for i in [s.away, s.home]:
-		i = select (i)
+		i = select (i, s)
 
 		if i.captain in i.xi: x = i.captain
 		elif i.lastcapt in i.xi: x = i.lastcapt
@@ -1065,23 +1099,23 @@ def game (s, g):
 	allplayers = [*s.home.xi, *s.away.xi]
 	print ()
 
-	k = [x for x in allplayers if x.games == 0]
 	h = [x for x in allplayers if x.games == 0]
 	h = quicksort(h)
-	h = [x.name for x in h]
+	h.sort(key = lambda x: x.team)
+	k = [x.name for x in h]
 
 	if g == s.games[0]:
 		print ()
 		for i in s.home.xi: longdesc(i)
 		print('Not selected:', end = ' ')
-		b = quicksort([y for y in s.home.active if y not in s.home.xi and (y.bat > 40 or y.bowl < 30 or y.games > 15 or (y.bat > 30 and y.bowl < 35) or y in s.home.lastxi) and y not in s.home.unav and y not in s.home.inj])
+		b = quicksort([y for y in s.home.active if y not in s.home.xi and (((y.bat > 40 or y.bowl < 30 or y.games > 15 or (y.bat > 30 and y.bowl < 35)) and y.end > current-3) or y in s.home.lastxi) and y not in s.home.unav and y not in s.home.inj])
 		print(listshow([quickdesc(x) for x in b]))
 		print ()
 
 	if len (h) > 0:
 		print ('Debut:', end = ' ')
-		print(listshow(h))
-		for i in k: i.debut = g[0]
+		print(listshow(k))
+		for i in h: i.debut = g[0]
 
 	milestonegame (allplayers)
 
@@ -1098,7 +1132,7 @@ def game (s, g):
 
 	PaceFactor,SpinFactor = 1,1
 
-	return t
+	return s, t
 
 def trophy (s):
 	global trophies
@@ -1158,7 +1192,7 @@ def playseries (s):
 	for i in s.games:
 		print ()
 		print (i)
-		x = game(s,i)
+		s, x = game(s,i)
 		s.results.append(x)
 		s.inns = s.inns + x.inns
 		s.bowls = s.bowls + x.bowls
@@ -1196,6 +1230,8 @@ def playseries (s):
 	print ()
 
 	if pause == 'p': input()
+
+	return s
 
 
 
@@ -1307,6 +1343,8 @@ def harmmean (x, y):
 
 def seasonstats (p, t):
 	print ()
+	print ()
+	print ()
 	a = []
 	for i in p:
 		y = sum([x.runs for x in i.inns if x.test.year == t])
@@ -1340,16 +1378,14 @@ def seasonstats (p, t):
 
 	b = [x for x in inns if x.test.year == t]
 	b.sort(key = lambda x: x.runs, reverse = True)
-	if len(b) > 100:
+	if len(b) > 50:
 		print ('Top innings in', str(t))
 		c = [x for x in b if x.runs >= 200 or x in b[:5]]
 		c.sort(key = lambda x: x.test.no)
-		for i in c:
-			y = ''
-			if i.out == 1: x = ' '
-			else: x = "*"
-			print (i.name.ljust(20), i.player.team.ljust(13), i.runs, x, i.balls, y, end = ' ') 
-			i.test.gamedesc()
+		if i.out == 1: x = ' '
+		else: x = "*"
+		print (i.name.ljust(20), i.player.team.ljust(13), str(i.runs).rjust(3), x, str(i.balls).rjust(3), end = ' ') 
+		i.test.gamedesc()
 		print ()
 
 	b = [x for x in bowls if x.test.year == t]
@@ -1370,12 +1406,12 @@ def rating (x, t, p):
 			points = points + a[0]*0.8**j
 			games = games + a[1]*0.8**j
 
-		if games >= 2: i.rating = round(100*points/games,2)
+		if games >= 5: i.rating = round(100*points/games,2)
 		else: i.rating = -1
-
+		#print (i.name, i.rating, points, games)
 	t.sort(key = lambda x: x.rating, reverse = True)
 
-	if len([x for x in t if i.rating >= 0]) > 0:
+	if len([x for x in t if x.rating >= 0]) > 1:
 		print ()
 		print ('End of year ratings')
 		print ('Teams')
@@ -1397,14 +1433,15 @@ def rating (x, t, p):
 		print ()
 		a = [x for x in c if 'Open' in x.tag]
 		xi = a[:2]
-		n = 0
-		while len(xi) < 5:
-			if c[n] not in xi: xi.append(c[n])
-			n = n + 1
 
 		a = [x for x in c if 'WK' in x.tag]
 		if len(a) == 0: pass
 		elif a[0] not in xi: xi.append(a[0])
+
+		n = 0
+		while len(xi) < 6:
+			if c[n] not in xi: xi.append(c[n])
+			n = n + 1
 
 		print ('Bowlers')
 		c.sort(key = lambda x: x.bowlform, reverse = True)
@@ -1418,9 +1455,17 @@ def rating (x, t, p):
 		if len(a) > 0:
 			if a[0] not in xi: xi.append(a[0])
 
+		a = [x for x in c if quickorder(x.tag) == 3]
+		if len(a) > 1:
+			if a[0] not in xi: xi.append(a[0])
+			if a[1] not in xi: xi.append(a[1])
+
+		x = False
 		n = 0
-		while n < 3:
-			if c[n] not in xi: xi.append(c[n])
+		while x == False:
+			if c[n] not in xi: 
+				xi.append(c[n])
+				x = True
 			n = n+1
 
 		print ("All-rounders")
@@ -1437,7 +1482,9 @@ def rating (x, t, p):
 		print ()
 		print ('World XI:', end = ' ')
 		xi = order (xi, '')
-		print(listshow ([x.name for x in xi]))
+		print(listshow (["{} ({})".format(x.name,x.team) for x in xi]))
+
+	return t
 
 def retire (t, tag, x):
 	tick = 0
@@ -1548,7 +1595,7 @@ def season (x, t):
 
 	for i in series:
 		if len (i.games) > 0:
-			playseries (i)
+			i = playseries (i)
 			t = retire (t, i.home, x)
 			t = retire (t, i.away, x)
 
@@ -1556,6 +1603,8 @@ def season (x, t):
 
 	seasonstats (allplayers, x)
 	t = rating (x, t, allplayers)
+
+	return t
 
 def startup():
 	global current, eradata, PaceFactor, SpinFactor, inns, bowls, folder, pause
@@ -1581,12 +1630,13 @@ def startup():
 
 	print ('Modes:')
 	print ('historical - player countries and time periods are unchanged')
+	print ('text - as historical, except players listed in "switch.txt" will have their countries switched.')
 	print ('random - player time periods are randomized, but countries are unchanged')
 	print ('shuffle - player countries are randomized, but time periods are unchanged')
 	print ('chaos - player countries and time periods are both randomized')
 	print ()
 	mode = ''
-	while mode not in ['r','c','h','s']: mode = input("Input: 'h' for historical, 'r' for random, 's' for shuffle, 'c' for chaos: ")
+	while mode not in ['r','c','h','s', 't']: mode = input("Input: 'h' for historical, 't' for text, 'r' for random, 's' for shuffle, 'c' for chaos: ")
 
 	pause = input('Type "p" for pause mode. ')
 
@@ -1672,8 +1722,8 @@ def summary (teams, allplayers, inns, bowls):
 	print ()
 
 	allplayers.sort(key = lambda x: x.dob)
-	#for i in allplayers:
-		#if i.games == 0: longdesc (i)
+	for i in allplayers:
+		if i.games == 0: longdesc (i)
 
 	print ('All players: ', sum([x.runs for x in inns]), 'runs @',sum([x.runs for x in inns])/sum([x.out for x in inns]))
 	print ()
@@ -1685,7 +1735,7 @@ if __name__ == "__main__":
 
 	for i in range (1877, 2021):
 		current = i
-		season (i, teams)
+		teams = season (i, teams)
 		if pause == 'p': input()
 
 	summary (teams, allplayers, inns, bowls)

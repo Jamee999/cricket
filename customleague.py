@@ -1,11 +1,17 @@
 from custom import getcustom
 from game import setup, game
 from altcricket import seri
+import os
 
 def league (t, n):
+	folder = 'scorecards'
+	if not os.path.exists(folder): os.makedirs(folder)
+	fileList = os.listdir(folder)
+	for fileName in fileList: os.remove("{}/{}".format(folder,fileName))
+
 	log = []
 	for i in t:
-		log.append([i.name, 0, 0])
+		log.append([i.name, 0, 0, 0])
 
 	s = seri()
 	for i in t:
@@ -23,20 +29,23 @@ def league (t, n):
 				g = setup (i.name, j.name)
 				g.home.active = i.active
 				g.away.active = j.active
+				g.no = c
 				x = game (g)
 				s.results.append(x)
 				s.inns = s.inns + x.inns
 				s.bowls = s.bowls + x.bowls
-				x.no = c
 				c += 1
 
 				for k in log:
-					if k[0] in [g.home.name, g.away.name]: k[2] +=1
-					if g.win in ['Draw','Tie']: continue
-					if g.win.name == k[0]: k[1] += 1
-				log.sort(key = lambda x: x[1], reverse = True)
+					if k[0] in [g.home.name, g.away.name]: 
+						k[2] +=1
+						if g.win in ['Draw','Tie']: 
+							k[3] += 1
+							continue
+						if g.win.name == k[0]: k[1] += 1
+				log.sort(key = lambda x: x[1] + x[3]/1000, reverse = True)
 				for k in log:
-					print ('{} {} games {} wins'.format(k[0].ljust(20), k[2], str(k[1]).rjust(3)))
+					print ('{} {} games {} wins {} draws'.format(k[0].ljust(20), str(k[2]).rjust(3), str(k[1]).rjust(3), str(k[3]).rjust(3)))
 
 	print ()
 	print ()
@@ -45,9 +54,8 @@ def league (t, n):
 
 	print ()
 	for k in log:
-		print ('{} {} games {} wins'.format(k[0].ljust(20), k[2], str(k[1]).rjust(3)))
+		print ('{} {} games {} wins {} draws'.format(k[0].ljust(20), k[2], str(k[1]).rjust(3), str(k[3]).rjust(3)))	
 	print ()
-
 	s.players.sort(key = lambda x: x.runs, reverse = True)
 	for i in s.players:
 		if i.batav > 50 or i in s.players[:10]:

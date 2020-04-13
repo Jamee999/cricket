@@ -72,7 +72,7 @@ def firstxi (x):
 
 def game(t):
 	for i in [t.home, t.away]:
-		if len (i.squad) > 11 or i.squad == []: i.xi = firstxi(i)
+		if len (i.active) != 11: i.xi = firstxi(i)
 		else: i.xi = i.active
 		#print (i.name, i.xi, i.squad, i.active)
 		i.gamecapt = [x for x in i.xi if x.capt == max([x.capt for x in i.xi])][0]

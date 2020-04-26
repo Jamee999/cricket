@@ -64,11 +64,24 @@ def getplayers():
 def make (x):
 	p = getplayers()
 	while len(x.active) < 11 or add == True:
+		print ()
 		n = input("Please enter a player's name. ")
 		e = [x for x in p if n == x.name]
 		f = [x.name for x in p if n in x.name]
 		if len(e) > 1:
-			print (e)
+			j = 1
+			for i in e:
+				print (j, i.name, i.team, i.tag, 'First', i.first, 'Last', i.last)
+				j+=1	
+
+			k = input('Enter the number of the player you wish to select. ')
+			try:
+				x.active.append(e[int(k)-1])
+				print ('Success - player in database added to team.')
+			except:
+				print ('Player not found, please try again.')
+				continue
+
 		elif len(e) == 1: 
 			e[0].team = x.name
 			x.active.append(e[0])

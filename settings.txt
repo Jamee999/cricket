@@ -1,0 +1,24 @@
+active = false
+# If this does not read "true" the file will not be read.
+# any other setting can be replaced with "default"
+
+pace = default
+spin = default
+outfield = default
+# Higher numbers are more favorable to batsmen, 1 is average - normal settings range between 0.5 and 1.5
+# Default will generate a ground wthin realistic parameters.
+
+year = default
+# Default is 2020 for custom games
+overs = default
+# Default is 450
+
+average = default
+runrate = default
+# Average is runs/wicket, runrate is runs/over. "default" will use year values. Using "default" for runrate currently also sets the average value to default.
+
+venue = default
+weather = default
+# Weather options: the 12 test-playing countries, "Timeless" or "default", which has no weather delays.
+
+ #The last line of the file cannot be used for settings.

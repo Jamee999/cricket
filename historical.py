@@ -14,6 +14,10 @@ def HistoricalYearsSelect (x,y):
 		a = str(input("Type 'all' for all-time teams, 'random' for a random year, or input a year (or range of years): ")) #User Input
 		if a == 'same': return [x,y]
 		elif a == 'all': return [1877,CurrentYear]
+		elif a == 'random':
+			x = random.choice(range(1877, CurrentYear+1))
+			print (x)
+			return [x,x]
 		elif "-" in a:
 			x = a.split("-")
 			a = int(x[0])
@@ -128,7 +132,7 @@ def series (home, away, homeplayers, awayplayers):
 		if o == 0: a = r
 		else: a = round(r/o,2)
 		if (a >= 50 and o > 1) or r >= 100*len(s.results) or i in s.players[:3]:
-			print (i.name, r, "runs @", a, end = ', ')
+			print ('{} {} runs @ {}'.format(i.name, r, a), end = ', ')
 	print()
 	s.players.sort(key = lambda x: sum([y.wickets for y in s.bowls if y.player == x]), reverse = True)
 	for i in s.players:

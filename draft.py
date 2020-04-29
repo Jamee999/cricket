@@ -21,14 +21,17 @@ def userselection (t, p):
 	print(listshow([(x.name, x.tag) for x in t.active]))
 	print ()
 	s = []
-	for i in range (0, 5):
+	for i in range (0, 6):
 		c = [x for x in p if quickorder(x.tag) == i]
 		n = 0
 		if i < 3: c.sort(key = lambda x: x.bat, reverse = True)
-		else: c.sort (key = lambda x: x.bat + 2*(45-x.bowl), reverse = True)
+		elif i < 5: c.sort (key = lambda x: x.bat + 2*(45-x.bowl), reverse = True)
+		else: 
+			c = p
+			c.sort(key = lambda x: x.bowl, reverse = False)
 
 		while len(c) > 0 and n < 6:
-			s.append(c[0])
+			if c[0] not in s: s.append(c[0])
 			c.pop(0)
 			n += 1
 

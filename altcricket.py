@@ -1860,8 +1860,8 @@ def summary (teams, allplayers, inns, bowls):
 	print ()
 
 	allplayers.sort(key = lambda x: x.dob)
-	for i in allplayers:
-		if i.games == 0: longdesc (i)
+	#for i in allplayers:
+		#if i.games == 0: longdesc (i)
 
 	print ('All players: ', sum([x.runs for x in inns]), 'runs @',sum([x.runs for x in inns])/sum([x.out for x in inns]))
 	print ()

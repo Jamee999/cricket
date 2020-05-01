@@ -1,3 +1,4 @@
+Name, era-adjusted batting average, era-adjusted bowling average, role in team, debut year, final year, batting SR modifier, bowling ER modifier, number of games captained.
 
 Jamee's 999ers
 ["AN Cook", 41.97, 100.0, "OpenBat", 2006, 2018, 0.9390859122054063, 0.8, 59, ]

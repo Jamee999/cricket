@@ -6,17 +6,17 @@ There are several different programs inside the folder. To run them, you will ne
 
 List of the different programs that can be run:
 
-altcricket.py - Simulate the entire history of Test match cricket, with a number of different alternate historical options.
+**altcricket.py** - Simulate the entire history of Test match cricket, with a number of different alternate historical options.
 
-custom.py - Run a game or series of games between custom teams. The teams can be loaded from a textfile, or created using the database of real players.
+**custom.py** - Run a game or series of games between custom teams. The teams can be loaded from a textfile, or created using the database of real players.
 
-customleague.py - Run a round-robin league between a number of custom teams.
+**customleague.py** - Run a round-robin league between a number of custom teams.
 
-draft.py - Draft a team and the program will simulate a league. You can also have the computer draft all the teams.
+**draft.py** - Draft a team and the program will simulate a league. You can also have the computer draft all the teams.
 
-historical.py - Run a game or series of games between historical or all-time teams. 
+**historical.py** - Run a game or series of games between historical or all-time teams. 
 
-historicalleague.py - Run a round-robin league between a number of historical or all-time teams.
+**historicalleague.py** - Run a round-robin league between a number of historical or all-time teams.
 
 
 If you manually edit the team data files, you need to then run the **pickleplayers.py** file, before any changes will show up in your sim.

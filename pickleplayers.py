@@ -17,7 +17,9 @@ def run():
 				p.bowl = float(x[2])
 				p.tag = x[3][2:-1]
 				p.first = int(x[4])
+				p.realfirst = int(x[4])
 				p.last = int(x[5])
+				p.reallast = int(x[5])
 				p.sr = float(x[6])
 				p.er = float(x[7])
 				p.capt = int (x[8])

@@ -1,4 +1,6 @@
-import random
+import random, pickle
+from callcricketnew import player
+import pickleplayers
 
 nations = ['england', 'australia', 'southafrica', 'westindies', 'newzealand', 'india', 'pakistan', 'srilanka', 'zimbabwe', 'bangladesh', 'afghanistan', 'ireland']
 
@@ -248,3 +250,5 @@ for i in nations:
     
 
     print (str('Data written to ' +str(country) +'data.txt'))
+
+pickleplayers.run()

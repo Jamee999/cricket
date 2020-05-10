@@ -18,61 +18,59 @@ def setup(home, away):
 	t.saveallcards = True
 	return t
 
-def firstxi (x):
-	a, o, b, k, f, s, xi = [], [], [], [], [], [], []
-	roles = {0:o, 1:b, 2:k, 3:f, 4:s} 
+def value (p, t, s = False):
+	x = p.bat
+	if quickorder(p.tag) == 3: x = x + (60-p.bowl)*3*(t.pitch[1]/t.pitch[0])
+	elif quickorder (p.tag) == 4: 
+		x = x + (60-p.bowl)*3*(t.pitch[0]/t.pitch[1])
+		if s == True: x = x*1.5
+	return x + 10 * random.random()
 
+def firstxi (x, t):
 	if len(x.squad) == 0: pool = x.active
 	else: pool = x.squad
 
-	for i in pool:
-		n = quickorder(i.tag)
-		roles[n].append(i)
+	f = [x for x in pool if quickorder(x.tag) == 3]
+	f.sort(key = lambda x: x.bowl - 5*random.random())
+	y = f[:2]
 
-	k.sort(key = lambda x: x.bat + 5*random.random(), reverse = True)
-	if len(k) > 0:
-		xi.append(k[0])
-	elif len(b) > 0:
-		z = random.choice(b)
-		xi.append(z)
-		b.remove(z)
+	pool = [x for x in pool if x not in y]
+	pool.sort(key = lambda x: value(x, t), reverse = True)
+	y.append(pool[0])
+	pool.pop(0)
 
-	o.sort(key = lambda x:  x.bat+ 5*random.random(), reverse = True)
-	while len(o) > 0 and len(xi) < 3:
-		xi.append(o[0])
+	if len ([x for x in y if quickorder(x.tag) == 4]) == 0: pool.sort(key = lambda x: value (x, t, s = True), reverse = True)
+	else: pool.sort(key = lambda x: value (x, t), reverse = True)
+	y.append(pool[0])
+
+	#print ([x.name for x in y])
+
+	pool = [x for x in pool if x not in y]
+	pool.sort(key = lambda x: x.bat + 5*random.random(), reverse = True)
+	y = y + pool[:5]
+
+	#print ([x.name for x in y])
+
+	o = [x for x in pool if 'Open' in x.tag and x not in y]
+	while len([x for x in y if 'Open' in x.tag]) < 2 and len(o) > 0:
+		y.append(o[0])
 		o.pop(0)
 
-	f.sort(key = lambda x: x.bowl+ 5*random.random(), reverse = False)
-	while len (f) > 0 and len(xi) < 5:
-		xi.append(f[0])
-		f.pop(0)
+	k = [x for x in pool if 'WK' in x.tag and x not in y]
+	if len([x for x in y if 'WK' in x.tag]) < 1 and len(k) > 0: y.append(k[0])
 
-	c = f+s
-	c.sort(key = lambda x: x.bowl+ 5*random.random(), reverse = False)
-	while len (c) > 0 and len(xi) < 7:
-		xi.append(c[0])
-		c.pop(0)
+	pool = [x for x in pool if x not in y]
+	while len (y) < 11:
+		y.append(pool[0])
+		pool.pop(0)
 
-	a = [x for x in pool if x not in xi]
-
-	a.sort(key = lambda x:x.bat+ 5*random.random(), reverse = True)
-	while len (a) > 0 and len(xi) < 10:
-		xi.append(a[0])
-		a.pop(0)
-
-	while len(a) > 0 and len(xi) < 11:
-		if len([x for x in xi if x.bat < 20 and quickorder(x.tag) > 1]) >= 4: a.sort(key = lambda x: x.bat/2 + max(0, 45-x.bowl)+ 5*random.random(), reverse = True)
-		else: a.sort(key = lambda x: x.bat, reverse = True)
-		xi.append(a[0])
-		a.pop(0)
-
-	xi = order (xi, x)
-	return xi
+	y = order (y, x)
+	return y
 
 
 def game(t):
 	for i in [t.home, t.away]:
-		if len (i.active) != 11: i.xi = firstxi(i)
+		if len (i.active) != 11: i.xi = firstxi(i, t)
 		else: i.xi = i.active
 		#print (i.name, i.xi, i.squad, i.active)
 		i.gamecapt = [x for x in i.xi if x.capt == max([x.capt for x in i.xi])][0]

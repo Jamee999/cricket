@@ -1,6 +1,6 @@
 from callcricketnew import test, innings, bowling, player, team, quickorder, listshow, playerwrite
 from game import game, setup
-from altcricket import seri
+from altcricket import seri, statsdump
 import pickle, datetime, random, copy, os
 
 def HistoricalYearsSelect (x,y):
@@ -146,6 +146,8 @@ def series (home, away, homeplayers, awayplayers):
 	print ()
 	print ('Man of the series: {} ({})'.format(s.players[0].name, s.players[0].team))
 	print ()
+
+	statsdump (s.players, s.inns, s.bowls, folder = folder)
 
 
 

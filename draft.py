@@ -35,6 +35,7 @@ def userselection (t, p):
 			c.pop(0)
 			n += 1
 
+	s.sort(key = lambda x: quickorder(x.tag))
 	print ('List of suggested players:' , end = ' ')
 	print(listshow([(x.name, x.tag) for x in s]))
 

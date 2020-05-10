@@ -1,24 +1,40 @@
 active = false
 # If this does not read "true" the file will not be read.
-# any other setting can be replaced with "default"
+# Any paramater set as "default" will be ignored
 
-pace = default
-spin = default
-outfield = default
+pace = 1
+spin = 1
+outfield = 1
 # Higher numbers are more favorable to batsmen, 1 is average - normal settings range between 0.5 and 1.5
 # Default will generate a ground wthin realistic parameters.
 
+venue = Lord's
+weather = default
+# Weather options: the 12 test-playing countries, "Timeless" or "default", which has no weather delays.
+
 year = default
 # Default is 2020 for custom games
-overs = default
-# Default is 450
+overs = 900
+# Default is 450 for non-Timeless games
+# If the "weather" setting is after the overs setting in this file, the overs setting will not work.
 
 average = default
 runrate = default
 # Average is runs/wicket, runrate is runs/over. "default" will use year values. Using "default" for runrate currently also sets the average value to default.
 
-venue = default
-weather = default
-# Weather options: the 12 test-playing countries, "Timeless" or "default", which has no weather delays.
+toss = default
+# If the toss setting does not read exactly "home" or "away" it will not work.
+choice = default
+# If the choice setting does not read exactly "bat" or "bowl" it will not work.
+
+homecapt = default
+homewk = default
+awaycapt = default
+awaywk = default
+# Sets the team's captain / wicket-keeper to a player in the team with exactly the name specified. If multiple players have the name, one is picked at random. 
+# If no player in the XI has the name provided, the role is picked as normal.
+
+showbowlingchanges = default
+# Shows bowling changes in the game log.
 
  #The last line of the file cannot be used for settings.

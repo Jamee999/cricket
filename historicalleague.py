@@ -4,12 +4,15 @@ from callcricketnew import team
 
 def setup (x):
 	t = team ()
-	t.name = x
 	t.active = histplayers(x, a, b)
+	if x == 'all': 
+		x = 'World'
+		for i in t.active: i.team = x
+	t.name = x
 	return t
 
 if __name__ == '__main__':
-	print ('Custom league')
+	print ('Historical league')
 
 	x = teamnumber ()
 	t = []

@@ -1,6 +1,6 @@
 from custom import getcustom
 from game import setup, game
-from altcricket import seri
+from altcricket import seri, statsdump
 import os
 
 def league (t, n):
@@ -72,6 +72,8 @@ def league (t, n):
 	print ()
 	print ('Man of the series: {} ({})'.format(s.players[0].name, s.players[0].team))
 	print ()
+
+	statsdump (s.players, s.inns, s.bowls, folder)
 
 
 def teamnumber ():

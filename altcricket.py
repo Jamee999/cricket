@@ -1405,8 +1405,10 @@ def switchcheck (p, t, y, a):
 		if p in t.xi: t.xi.remove(p)
 		if p in t.active: t.active.remove(p)
 
-		p.team = p.secondteam
-		p.secondteam = ''
+		if y >= 1900:
+			p.team = p.secondteam
+			p.secondteam = ''
+		else: p.team, p.secondteam = p.secondteam, p.team
 		for i in teams:
 			if i.name == p.team: i.players.append(p)
 		longdesc (p)
@@ -1906,10 +1908,10 @@ def statsdump (p, i, b, folder):
 	g = open(batstats, 'w')
 	g.close()
 	f = open(batstats, 'a')
-	f.write('Player, Team, Opposition, #, Year, Venue, Result, Runs, Balls, Out, 4s, 6s, Score, Wickets')
+	f.write('Player, Team, Opposition, #, Year, Venue, Winner, Margin, Runs, Balls, Out, 4s, 6s, Score, Wickets')
 	f.write('\n')
 	for j in i:
-		for k in [j.name, j.player.team, j.opposition.name, j.test.no, j.test.year, j.test.venue, j.test.resultdesc, j.runs, j.balls, j.dismissal, j.fours, j.sixes, j.teaminnings.runs, j.teaminnings.wickets]:
+		for k in [j.name, j.player.team, j.opposition.name, j.test.no, j.test.year, j.test.venue, j.test.winname, j.test.margin, j.runs, j.balls, j.dismissal, j.fours, j.sixes, j.teaminnings.runs, j.teaminnings.wickets]:
 			f.write(str(k))
 			f.write(', ')
 		f.write('\n')
@@ -1919,10 +1921,10 @@ def statsdump (p, i, b, folder):
 	g = open(bowlstats, 'w')
 	g.close()
 	f = open(bowlstats, 'a')
-	f.write('Player, Team, Opposition, #, Year, Venue, Result, Overs, Balls, Maidens, Runs, Wickets, Score, Team W')
+	f.write('Player, Team, Opposition, #, Year, Venue, Winner, Margin, Overs, Balls, Maidens, Runs, Wickets, Score, Team W')
 	f.write('\n')
 	for j in b:
-		for k in [j.name, j.player.team, j.opposition.name, j.test.no, j.test.year, j.test.venue, j.test.resultdesc, j.overs, j.balls, j.maidens, j.runs, j.wickets, j.teaminnings.runs, j.teaminnings.wickets]:
+		for k in [j.name, j.player.team, j.opposition.name, j.test.no, j.test.year, j.test.venue, j.test.winname, j.test.margin, j.overs, j.balls, j.maidens, j.runs, j.wickets, j.teaminnings.runs, j.teaminnings.wickets]:
 			f.write(str(k))
 			f.write(', ')
 		f.write('\n')

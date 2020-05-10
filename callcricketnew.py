@@ -145,6 +145,10 @@ class teaminnings:
 
 		y = (' {} - {} innings'.format(self.team.name, self.number))
 
+		if self.test.odi == True: y = ' {}'.format(self.team.name)
+
+		if len(self.test.teaminnings) == 2 and self.test.odi == True: y = y + ' (Target: {} in {} overs)'.format(self.test.teaminnings[0].runs+1, self.test.overslimit)
+
 		if len(self.test.teaminnings) == 3 and self.test.teaminnings[1].team == self.team: y = y + ' (following on)'
 		if len(self.test.teaminnings) == 4: y = y + ' (Target: {} in {} overs)'.format(self.target()+self.runs, self.test.remaining() + self.overs)
 		self.test.score (y)
@@ -162,7 +166,7 @@ class teaminnings:
 
 		if len(self.test.teaminnings) > 1: self.test.logger('Start of innings')
 
-		while self.wickets < 10 and self.active == True:
+		while self.wickets < 10 and self.active == True and (self.test.odi == False or self.overs < self.test.overslimit):
 			self.test.raincheck()
 			self.over()
 
@@ -215,6 +219,8 @@ class teaminnings:
 
 		#self.test.logger ((self.bowler.name, round(x)))
 
+		#if self.test.odi == True: x = self.bowlchangeodi()
+
 		if x >= 10 and random.random() < x/100: 
 			b = self.bowlchoice(change = change)
 			if b is not self.bowler: self.bowler.bowling.spell = 0
@@ -257,6 +263,8 @@ class teaminnings:
 
 		x = x - 50*random.random()
 
+		#if self.test.odi == True: x = self.bowlvalueodi(p)
+
 		return x
 
 	def det (self):
@@ -273,6 +281,8 @@ class teaminnings:
 		return x
 
 	def aggfactor (self):
+		#f self.test.odi == True: return self.aggfactorodi()
+
 		x = 1
 		if len(self.test.teaminnings) < 4:
 			if self.runs > 400: x =  x + (self.runs-400)/1000
@@ -514,7 +524,7 @@ class teaminnings:
 		else: self.overlog.append('.')
 
 	def over (self):
-		if self.test.overcount() % 90 == 0:
+		if self.test.overcount() % 90 == 0 and self.test.odi == False:
 			for i in self.order: i.spell = 0 
 			self.fatigue = []
 
@@ -538,7 +548,6 @@ class teaminnings:
 			self.ball()
 			self.result()
 			
-
 		self.day()
 
 		if self.runs - x == 0 and self.balls == 6: 
@@ -564,6 +573,8 @@ class teaminnings:
 			self.bowler, self.otherbowler = self.otherbowler, self.bowler
 
 	def day (self):
+		if self.test.odi == True: return 1
+
 		y = round(1+(self.test.overcount())//90)
 		z = self.test.overcount() % 90
 		a = '{} {}* ({}b), {} {}* ({}b)'.format(self.batsmen[0].name, self.batsmen[0].innings.runs, self.batsmen[0].innings.balls, self.batsmen[1].name, self.batsmen[1].innings.runs, self.batsmen[1].innings.balls)
@@ -617,6 +628,8 @@ class teaminnings:
 		return y
 
 	def declaration (self):
+		if self.test.odi == True: return False
+
 		if self.test.weather == 'Timeless' or len(self.test.teaminnings) == 4 or self.wickets == 10: return False
 		for i in self.batsmen:
 			if i.innings.runs % 100 > 89 and (i is not self.team.captain or random.random() < 0.9): return False
@@ -712,7 +725,6 @@ class teaminnings:
 		else:
 			y = '({} wickets - {} overs) {}   ({} RPO)'.format(self.wickets, oversballs (self), self.runs, z)
 
-
 		self.test.score (y.rjust(89))
 
 		b = [x.name for x in self.innings if x.balls == 0]
@@ -738,6 +750,8 @@ class teaminnings:
 			self.test.score (y)
 
 	def followon (self):
+		if self.test.odi == True: return self.bowlteam
+
 		if len(self.test.teaminnings) == 2 and self.lead() <= -200 and self.wickets == 10:
 			if (self.test.weather == 'Timeless' and self.lead() <= -300) or -(self.lead())  > self.test.remaining()-self.test.lostovers + self.overs*0.5:
 				self.test.logger('{} chose to enforce the follow-on.'.format(self.bowlteam.gamecapt.name))
@@ -760,10 +774,10 @@ class teaminnings:
 		if b > a and len(self.test.teaminnings) == 3:
 			if b-a != 1: return 'an innings and {} runs'.format(b-a)
 			else: return 'an innings and 1 run'
-		elif b > a and len(self.test.teaminnings) == 4:
+		elif b > a and (len(self.test.teaminnings) == 4 or self.test.odi == True and len(self.test.teaminnings)==2):
 			if b-a != 1: return '{} runs'.format(b-a)
 			else: return '1 run'
-		elif len(self.test.teaminnings) == 4 and a > b:
+		elif (len(self.test.teaminnings) == 4 or self.test.odi == True and len(self.test.teaminnings)==2) and a > b:
 			if self.wickets != 9: return '{} wickets'.format(10-self.wickets)
 			else: return '1 wicket'
 		else: return ''
@@ -794,6 +808,8 @@ class teaminnings:
 			x = ' {} ({}) beat {} ({}) by {}'.format(self.test.win.name, listshow(a), [x for x in [self.test.home, self.test.away] if x is not self.test.win][0].name, listshow(b), self.test.margin)
 		self.test.score(x)
 		self.test.resultdesc = x
+		if self.test.win in ['Draw', 'Tie']: self.test.winname = self.test.win
+		else: self.test.winname = self.test.win.name
 
 		self.test.motmpick()
 
@@ -844,6 +860,24 @@ class teaminnings:
 		b = sum([x.runs for x in self.test.teaminnings if x.team == self.bowlteam])
 
 		#print (a, b, self.test.remaining())
+
+		if self.test.odi == True: 
+			if a > b and len(self.test.teaminnings) == 2:
+				self.test.win = self.team
+				self.test.lose = self.bowlteam
+				self.finish()
+				return
+
+			if (self.wickets == 10 or self.overs == self.test.overslimit):
+				if b > a:
+					self.test.win = self.team
+					self.test.lose = self.bowlteam
+					self.finish()
+					return	
+				elif b == a:
+					self.test.win, self.test.margin = 'Tie', 'Tie'
+					self.finish()
+					return
 
 		if self.test.remaining() <= 0 and ((b >= a and self.wickets < 10) or (len(self.test.teaminnings) < 4 and a >= b)):
 			self.test.win, self.test.margin = 'Draw', 'Draw'
@@ -917,13 +951,18 @@ class test:
 		self.pregamestats()
 		#print ('scheduledovers', self.scheduledovers, 'gameovers', self.gameovers)
 		self.toss()
-		for i in range (4):
+
+		if self.odi == True: n = 2
+		else: n = 4
+
+		for i in range (n):
 			if self.win != '':
 				continue
 			x = teaminnings (self) 
 			self.teaminnings.append(x) 
 			self.blank()
 			x.run()
+
 		self.teaminnings[-1].endofgame()
 		self.stats()
 		for i in self.players:
@@ -1021,7 +1060,7 @@ class test:
 
 	def decision (self):
 		if self.choice == '':
-			if random.random() < 0.8: self.choice = True
+			if random.random() < 0.8 or (random.random() < 0.5 and self.odi == True): self.choice = True
 			else: self.choice = False
 
 		if self.choice == True: self.score ('{} has elected to bat first.'.format(self.tosswin.gamecapt.name))
@@ -1039,6 +1078,8 @@ class test:
 		return sum([x.overs for x in self.teaminnings]) + sum([x.balls > 0 for x in self.teaminnings if x is not self.teaminnings[-1]]) + self.lostovers
 
 	def raincheck (self):
+		if self.odi == True: return
+
 		if self.lostovers >= self.scheduledovers-self.gameovers: return
 		elif random.random() < (self.scheduledovers-self.gameovers)/(10*self.scheduledovers):
 			x = random.randrange(0,10) + round(random.random()*(self.scheduledovers-self.gameovers-self.lostovers))
@@ -1067,7 +1108,8 @@ class test:
 		self.players = [*self.home.xi, *self.away.xi]
 
 	def time (self):
-		x = (self.overcount() % 90)
+		if self.odi == True: x = self.overcount()
+		else: x = (self.overcount() % 90)
 		if self.overcount() >= 450 and self.scheduledovers == 450:
 			x = (self.overcount() - 360) + 15 + self.teaminnings[-1].balls/6
 		if 30 < x <= 60: x = x + 10
@@ -1344,6 +1386,8 @@ class test:
 	dates = ''
 	tosswin = ''
 	choice = ''
+	odi = False
+	overslimit = 50
 
 	win = ''
 	loss = ''
@@ -1381,7 +1425,6 @@ class innings:
 		self.drops = []
 		self.opposition = [x for x in [t.home, t.away] if x.name is not p.name][0]
 		self.teaminnings = t.teaminnings[-1]
-		p.inns.append(self)
 
 	def report (self, x):
 		if self.balls == 0: return
@@ -1430,6 +1473,8 @@ class innings:
 		else: return 0.95 + min(0.1, self.balls/2000) + min(0.05, self.runs/1000) #- min (0, (200-self.balls)/2000)
 
 	def stats (self):
+		self.player.inns.append(self)
+		self.test.inns.append(self)
 		if 100 > self.runs >= 50: self.player.fifties +=1
 		elif self.runs >= 100: self.player.centuries +=1
 		if self.runs >= 200: self.player.doubles +=1
@@ -1437,8 +1482,7 @@ class innings:
 			self.player.HS = self.runs
 			if self.out == False: self.player.HSNO = '*'
 			else: self.player.HSNO = ' '
-		self.test.inns.append(self)
-
+		
 	def desc (self):
 		if self.out == True: x = ' '
 		else: x = '*'
@@ -1469,7 +1513,6 @@ class bowling:
 		self.test = t
 		self.year = t.year
 		self.teaminnings = t.teaminnings[-1]
-		p.bowls.append(self)
 
 	def bowlformat (self):
 		a = oversballs(self).rjust(4)
@@ -1502,14 +1545,15 @@ class bowling:
 
 		return x
 
-
 	def stats (self):
+		self.player.bowls.append(self)
+		self.test.bowls.append(self)
 		if self.wickets >=5: self.player.fives += 1
 		if self.wickets > self.player.BBW or (self.wickets == self.player.BBW and self.runs < self.player.BBR):
 			self.player.BBW = self.wickets
 			self.player.BBR = self.runs
 		if any((self.player == y.player and self.wickets + y.wickets >= 10 and self is not y) for y in self.test.bowls): self.player.tens +=1
-		self.test.bowls.append(self)
+		
 
 	name = ''
 	player = ''
@@ -1595,7 +1639,7 @@ class player:
 	def statscsv (self):
 		'Name, Team, Debut, Last, Tests, Inns, NO, Runs, BF, Bat. Av., Bat. SR, 200s, 100s, 50s, HS, , Balls, Maidens, Runs, Wickets, Bowl. Av, Bowl. ER, Bowl. SR, 5xW, 10xW, Best, Bowling, Catches, Stumpings, Captained, MOTM'
 		x = [self.name, self.team, self.debut, self.end, self.games]
-		x.append(len(self.inns))
+		x.append(len([y for y in self.inns if y.balls > 0]))
 		x.append(len([y for y in self.inns if y.out == False]))
 		x = x + [self.runs, self.balls, self.batav, self.batsr, self.doubles, self.centuries, self.fifties, self.HS, self.HSNO]
 		x = x + [self.ballsbowled, self.maidens, self.bowlruns, self.wickets, self.bowlav, self.bowler, self.bowlsr, self.fives, self.tens, self.BBR, '-', self.BBW]
@@ -1603,6 +1647,7 @@ class player:
 		x.append(len(self.captgames))
 		x.append(len([y for y in self.captgames if isinstance(y.win, team) and y.win.name == self.team]))
 		x.append(len([y for y in self.captgames if isinstance(y.loss, team)and y.loss.name == self.team]))
+		#print (x)
 		return x
 
 

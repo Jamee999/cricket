@@ -27,7 +27,7 @@ def userselection (t, p):
 		if i < 3: c.sort(key = lambda x: x.bat, reverse = True)
 		elif i < 5: c.sort (key = lambda x: x.bat + 2*(45-x.bowl), reverse = True)
 		else: 
-			c = p
+			c = [x for x in p]
 			c.sort(key = lambda x: x.bowl, reverse = False)
 
 		while len(c) > 0 and n < 6:

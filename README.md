@@ -1,4 +1,4 @@
-Test match cricket simulator
+Test Match Cricket Simulator
 
 How to run: Download all the files, and then direct your command line to the folder where the files were downloaded. You may need to download python from https://www.python.org/ first, in order to make it work.
 

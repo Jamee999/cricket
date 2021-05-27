@@ -48,7 +48,7 @@ for i in nations:
     Players = []
     AllData = []
 
-    for i in range (0, 144):
+    for i in range (len(Years)):
         Years[i][0] = int(Years[i][0])
         Years[i][1] = float(Years[i][1])
         ERYears[i][0] = float(ERYears[i][0])
@@ -60,7 +60,15 @@ for i in nations:
         GameData = []
         Input = Lines[i]
         Set = Input.split(',')
-        print (Set)
+
+        while 2 == 2:
+            try:
+                int(Set[2])
+                break
+            except:
+                Set[1] = Set[1] + Set[2]
+                Set.remove(Set[2])
+
         Set[0] = Set[0][1:-1]
         Set[1] = Set[1][2:-1]
         for j in range (2, 20):
@@ -81,7 +89,7 @@ for i in nations:
                             Set[j] = float(Set[j][1:-1])
                         except:
                             Set[j] = 0
-                                           
+
         Name = Set[0]
         BowlStyle = Set[1]
         BowlStyle = BowlStyle.lower()
@@ -106,7 +114,6 @@ for i in nations:
 
         g = open('dob.txt','a')
         dobstats = [Set[0], Set[9], Set[16]]
-        print (dobstats)
         g.write (str(dobstats))
         g.write('\n')
 
@@ -181,7 +188,6 @@ for i in nations:
         EraAdjustedBowlAv = round(EraAdjustedBowlAv, 2)
         GameData.append(EraAdjustedBowlAv)
 
-        print (Name, Tests)
         if WKGames >= 40 or (WKGames/Tests) >=(1/3):
             Role = 'WK'
         elif (BallsBowled/Tests) < 24:
@@ -230,8 +236,8 @@ for i in nations:
         GameData.append(Role)
         GameData.append(FirstYear)
         GameData.append(LastYear)
-        GameData.append(BatRunsPerBall)
-        GameData.append(BowlER)
+        GameData.append(round(BatRunsPerBall,2))
+        GameData.append(round(BowlER,2))
         GameData.append(CaptGames)
         
         Players.append(GameData)

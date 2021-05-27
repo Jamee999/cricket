@@ -1,4 +1,4 @@
-import random, time, copy, os, shutil, datetime, pickle
+import random, time, copy, os, shutil, datetime, pickle, statistics
 from callcricketnew import test, innings, bowling, player, team, quickorder, listshow, pitchmake, playerwrite, scoreformat
 
 def era ():
@@ -73,84 +73,129 @@ def age (x):
 	except:
 		return 25
 
+def agegenerate (y):
+	y.dob = y.first - random.randrange(18,25)
+
+	if y.first - y.dob < 23: y.dob = y.dob - random.randrange(0,3)
+
+	if y.first == min or (y.first == 1992 and y.team == 'South Africa'): y.dob = y.dob - random.randrange(0,20)
+	elif y.first < 1918: y.dob = y.dob - random.randrange(0,10)
+
+	y.last = y.dob + random.randrange(35,45)
+
+	if y.last - y.dob >= 40: y.last = y.last - random.randrange(0,5)
+
+	return y
+
 def scenario (t, m):
+	print ()
 	allplayers = []
-	if m == 'r':
+	for i in t:
+		allplayers.extend(i.players)
+
+	dob = []
+	q = open('dob.txt', 'r')
+	for line in q:
+		line = line[1:-2].split(',')
+		line[0] = line[0][1:-1]
+		line[1] = int(line[1])
+		line[2] = int(line[2])
+		dob.append(line)
+	q.close()
+
+	prob = False
+	
+	if m in ['p', 'm']:
+		while type(prob) != float:
+			try:
+				prob = float(input("Enter the probability of a player's time period being changed: "))
+			except:
+				pass
+
+	if m in ['s', 'j']:
+		for i in dob:
+			i.append([x.team for x in allplayers if x.name == i[0] and x.realfirst == i[1]][0])
+
+		for i in allplayers:
+			i.dob = [x for x in dob if i.name == x[0] and i.realfirst == x[1]][0][2]
+
+		for i in allplayers:
+			if m == 'j' and random.random() > 0.05:
+				continue
+			c = [x for x in dob if x[2] == i.dob]
+			x = random.choice(c)
+			if m == 'j' and i.team != x[3]:
+				print (i.name.ljust(30), i.first, i.team.ljust(15), x[3])
+				i.name = i.name + '#'
+
+			i.team = x[3]
+		print ()
+
+	if m in ['r', 'p', 'j']:
 		for i in t:
 			years = []
 			for j in i.players:
 				years.append(j.first)
 			min = years[0]
 			years.sort(key = lambda x: random.random())
+			print (i.name)
 			for y in i.players:
-				y.first = years[0]
+				if m == 'r' or (m == 'p' and "#" not in y.name and (abs(y.first-years[0]) > 15 and random.random() < prob)) or (m == 'j' and random.random() < 0.05 and abs(y.first-years[0]) > 15):
+					print (y.name.ljust(30), y.first, years[0])
+					y.first = years[0]
+					y = agegenerate(y)
+					if m in ['p', 'j']:
+						y.name = y.name + '#'
+				if y.dob == 0:
+					y = agegenerate(y)
 				years.pop(0)
-				allplayers.append(y)
+			print ()
+		print ()
 
-	elif m == 'c':
+	if m in ['c', 'm', 'j']:
 		combos = []
 		for i in t:
 			for y in i.players:
 				combos.append([y.first,y.team])
-				allplayers.append(y)
+				#allplayers.append(y)
 		combos.sort(key = lambda x: random.random ())
 
 		for x in allplayers:
+			if m == 'm' and (random.random() > prob or (x.team == combos[0][1] and abs(x.first-combos[0][0]) <= 15)):
+				combos.pop(0)
+				continue	
+			if m == 'j'	and (random.random() > 0.01 or (x.team == combos[0][1] and abs(x.first-combos[0][0]) <= 15) or '#' in x.name):
+				combos.pop(0)
+				continue
+
+			if m in ['m', 'j']:
+				print (x.name.ljust(30), x.first, x.team.ljust(15), combos[0][0], combos[0][1])
+				x.name = x.name + '#'
 			x.first = combos[0][0]
 			x.team = combos[0][1]
 			if random.random() < 1/200:
 				x.secondteam = random.choice(t).name
+			x = agegenerate(x)
 			combos.pop(0)
+		print ()
 
 		for x in t:
 			x.players = [y for y in allplayers if y.team == x.name]
+			#allplayers = allplayers + x.players
 
-	elif m in ['h','s','t']: 
-		for x in t:
-			for y in x.players: allplayers.append(y)
-		dob = []
-		q = open('dob.txt', 'r')
-		for line in q:
-			line = line[1:-2].split(',')
-			line[0] = line[0][1:-1]
-			line[1] = int(line[1])
-			line[2] = int(line[2])
-			dob.append(line)
-		q.close()
 
-		if m == 's':
-			for i in dob:
-				i.append([x.team for x in allplayers if x.name == i[0] and x.first == i[1]][0])
-
-			for i in allplayers:
-				i.dob = [x for x in dob if i.name == x[0] and i.realfirst == x[1]][0][2]
-
-			for i in allplayers:
-				c = [x for x in dob if x[2] == i.dob]
-				x = random.choice(c)
-				i.team = x[3]
-				#dob.remove(x)
-
-			for x in t:
-				x.players = [y for y in allplayers if y.team == x.name]			
+	for x in t:
+		x.players = [y for y in allplayers if y.team == x.name]			
 
 	for i in t:
 		i.inj = []
 		i.players.sort(key = lambda x: x.first)
 		min = i.players[0].first
 		for y in i.players:
+			if m not in ['h', 's', 't', 'p', 'm', 'j']: 
+				y = agegenerate(y)
 
-			if m not in ['h', 's', 't']: 
-				y.dob = y.first - random.randrange(18,25)
-
-				if y.first - y.dob < 23: y.dob = y.dob - random.randrange(0,3)
-
-				if y.first == min or (y.first == 1992 and y.team == 'South Africa'): y.dob = y.dob - random.randrange(0,20)
-				elif y.first < 1918: y.dob = y.dob - random.randrange(0,10)
-
-				y.last = y.dob + random.randrange(35,45)
-
-				if y.last - y.dob >= 40: y.last = y.last - random.randrange(0,5)
+			elif "#" in y.name: continue 
 
 			else:
 				#print (y.name)
@@ -278,8 +323,6 @@ def setup (x):
 
 	return a
 
-
-
 def quicksort (x):
 	x.sort(key = lambda x: 10000*quickorder(x.tag) - x.bat - x.batform, reverse = False)
 	return x
@@ -336,15 +379,13 @@ def order (t, a):
 
 	if len (b) == 0: return last
 
-	for i in last:
-		if len (y) > 3 or i not in t or 'Open' not in i.tag: break
-		else: y.append(i)
+	o = [x for x in t if 'Open' in x.tag and 'WK' not in x.tag and x not in y]
+
+	if len(o) <= 3:
+		y = o
 
 	if len (y) < 3:
-		o = [x for x in t if 'Open' in x.tag and 'WK' not in x.tag and x not in y]
-
-		if len (o) < 2 or [quickorder(x.tag) for x in t].count(2) > 1:
-			o = [x for x in t if 'Open' in x.tag and x not in y]
+		o = [x for x in t if 'Open' in x.tag and x not in y]
 		o.sort(key = lambda x: batscore(x, t), reverse = True)
 
 	while len (y) < 3 and len(o) > 0:
@@ -608,11 +649,15 @@ def recent (p):
 		try:
 			if p.inns[-i].runs >= 75 and p.inns[-i].test.year >= current-2:
 				x = x + p.inns[-i].runs
+				if i == 1:
+					x = x + p.inns[-i].runs
 		except: pass
 
 		try:
 			if p.bowls[-i].wickets >= 3 and p.inns[-i].test.year >= current-2:
 				x = x + p.bowls[-i].wickets*25
+				if i == 1:
+					x = x + p.bowls[-i].wickets*25
 		except: pass
 
 	#print (p.name, x)
@@ -624,17 +669,20 @@ def tagvalue (p):
 def value (p, n, s = False):
 	global current, PaceFactor, SpinFactor
 	#p = candidate player, n = role
-	if quickorder(p.tag) == n or n == 9: x = recent (p)/5
+	if quickorder(p.tag) == n or n == 9: x = recent (p) + p.games
 	else: x = 0
 
-	if quickorder(p.tag) > 2: y = min (50, p.bowl)
-	elif 'Part' in p.tag: y = min(60, p.bowl)
-	else: y = p.bowl
+	if quickorder(p.tag) == 3: q = min (50, p.bowl)
+	elif quickorder(p.tag) == 4: q = min (50, p.bowl) - 10
+	elif 'Part' in p.tag: q = min(60, p.bowl)
+	else: q = p.bowl
 
-	if n < 3: x = x + p.bat + p.batform
-	else: x = x + (p.bat + p.batform)/2 + p.bowlform + max(0,(60-y))*(quickorder(p.tag)+1)*0.5
+	r = p.bat + p.batform + (min(20, p.games) * p.batav**2)/1000
 
-	if n == 9: x = x + (p.bat + p.batform)*3
+	if n < 3: x = x + r
+	else: x = x + r + p.bowlform + max(0,(60-q))*(quickorder(p.tag)+1)*0.5 + 1000*min(50, p.wickets)/max(1, p.bowlav**2)
+
+	if n == 9: x = x + r
 
 	c = 0
 	for a in range (20):
@@ -647,34 +695,38 @@ def value (p, n, s = False):
 
 	y, t = 0, 1000
 
-	if age(p.dob) < 25: y = y - (25-age(p.dob))
-	#if current < 1945: t = 500
+	if current < 1945 or quickorder(p.tag) == 4: t = 3000
+	#if age(p.dob) < 25: t = t - 150*(25-age(p.dob))
 
-	while y <= p.games and (quickorder(p.tag) == n or n == 9) and p.games < 5:
+	z = p.games**0.5 + max(0, 25-age(p.dob), age(p.dob)-35)
+
+	while y <= z and (quickorder(p.tag) == n or n == 9):
 		t = t * random.random()
 		y = y+1
-		if y > p.games: x = x + t
+		if y > z: x = x + t
 
 	if quickorder(p.tag) == n or (n==0 and 'Open' in p.tag) or n == 1 or (n == 5 and quickorder(p.tag) in [3,4]): x = x+100
 	elif n == 2: x = x-500
 
 	if quickorder(p.tag) == n == 2: x = x + 100
 
-	if p.dropdate >= current-1: x = x*(2/3)
+	if p.dropdate <= current: x = x - 100/(current-p.dropdate+1)
 
 	if current < 1945: x = x * (0.5 + random.random())
 
-	if quickorder(p.tag) == 3  and n > 2: x = x * (SpinFactor/PaceFactor)**2
-	elif quickorder(p.tag) == 4 and n > 2: x = x * (PaceFactor/SpinFactor)**2
+	if quickorder(p.tag) == 3  and n > 2: x = x + (60-q)*(SpinFactor/PaceFactor)**2
+	elif quickorder(p.tag) == 4 and n > 2: x = x + (60-q)*(PaceFactor/SpinFactor)**2
 
-	if s == True and quickorder(p.tag) == 4: x = x*(4/3)*max(1,PaceFactor/SpinFactor)
+	if s == True and quickorder(p.tag) == 4: x = x + 50 + x*max(1,PaceFactor/SpinFactor)**2
 
 	if age(p.dob) > 35 and current > 1945: 
 		y = (age(p.dob)-35)
 		if quickorder(p.tag) in ['Spin','OpenSpin']: y = y/2
+
 	elif age(p.dob) < 25 and p.games < 5: y = (25-age(p.dob))
 	else: y = 0
-	x = x - 10*y
+
+	x = x - 3*y**(1.5+random.random())
 
 	#print (p.name.ljust(20), round(x), n)
 
@@ -738,14 +790,14 @@ def returning (a, p):
 	if p in a.xi or p.end < current or p.games < 10: return a
 	a.xi.sort(key = lambda x: tagvalue (x), reverse = False)
 	for i in a.xi:
-		if (tagvalue(i)*1.1 < value(p, quickorder(i.tag))) or (p == a.captain and tagvalue(i) < value (p, quickorder(i.tag))):
+		if (tagvalue(i)*1.1 < value(p, quickorder(i.tag))) or (p == a.captain and tagvalue(i) < 1.5*value (p, quickorder(i.tag))):
 			a.xi.remove(i)
 			a.xi.append(p)
 			#print ('returning', i.name, p.name)
 			return a
 	return a
 
-def injury (a, game = True):
+def injury (a):
 	h = []
 	for i in a.inj:
 		if random.random() < 2/3: h.append(i)
@@ -763,15 +815,16 @@ def injury (a, game = True):
 			if random.random() < 0.01*(age(i.dob)-30):
 				a.inj.append(i)
 				continue
-			if random.random() < 1/8 and i.tag in ['Fast', 'OpenFast']:
+			if random.random() < 0.08 and quickorder(i.tag) == 4:
+				a.inj.append(i)
+				continue
+			if random.random() < 0.13 and quickorder(i.tag) == 3:
 				a.inj.append(i)
 				continue
 		if i.status == 'strike': i.status = ''
 
 	for i in a.inj:
 		i.status = 'inj'
-		if i in a.xi and game == True:
-			a = replace (i, a) 
 		if i in a.squad and random.random() < 1/20 and len(a.squad) > 11:
 			a.squad.remove(i)
 			a.unav.append(i)
@@ -788,7 +841,7 @@ def drop (p, t): #player, team
 	elif p not in t.xi or (p in [t.captain, t.lastcapt] and current > 1945): return False
 	elif p.status == 'unav': return True
 	elif p.batform > 40 or p.bowlform > 40 or (p.batform > 30 and p.bowlform > 30): return False 
-	elif p.batav > 37 or (p.bowlav < 28 and quickorder(p.tag) > 2): return False
+	elif p.batav > 35 or (p.bowlav < 27 and quickorder(p.tag) > 2): return False
 	elif p.games <= random.randrange(2,6) or recent (p) > 200 or tagvalue(p) > 400: return False
 	elif quickorder(p.tag) == 2 and len([x for x in t.squad if quickorder(x.tag) == 2 and x not in t.xi]) == 0 and [quickorder(x.tag) for x in t.xi].count(2) == 1: return False
 
@@ -824,6 +877,7 @@ def addplayer (a, e, n):
 def resign (c, t): #captain, team
 	global current
 	if len (t.tests) < 6 or current < 1945 or len(c.captgames) < 5 or c.captgames[-1].loss != t: return t
+	if c is not t.tests[-1].home.gamecapt and c is not t.tests[-1].away.gamecapt: return t
 
 	a = sum([0.5 + (x.loss.rating)/100 for x in c.captgames if x.win == t])
 	b = sum([1.5 - (x.win.rating)/100 for x in c.captgames if x.loss == t])
@@ -932,26 +986,31 @@ def leaveout (a, n):
 	return p[-1]
 
 def balance (a):
-	if PaceFactor > SpinFactor and rolecount (3, a.xi) >= 4: m, n = 4,3
-	elif PaceFactor > 1.1*SpinFactor and rolecount (4, a.xi) == 0: m, n = 4,3
-	elif SpinFactor > 1.2*PaceFactor and rolecount(4, a.xi) > 0: m, n = 3,4
-	elif SpinFactor > PaceFactor and rolecount(4, a.xi) > 1: m, n = 3,4
-	elif rolecount (4, a.xi) > 2: m,n = 3,4
+	global PaceFactor, SpinFactor
+	x = PaceFactor/SpinFactor #high numbers favor spinners
+	if rolecount (4, a.xi) == 0 and x > 0.85: m,n = 4,3
+	elif rolecount (4, a.xi) > 1 and x < 1.1: m,n = 3,4
+	elif rolecount (3, a.xi) > 4 and x > 1: m, n = 4,3
+	elif rolecount(4, a.xi) > 0 and x < 0.8: m, n = 3,4
+	elif rolecount(4, a.xi) + rolecount (3, a.xi) > 5: m,n = 1,9
+	elif rolecount (4, a.xi) < 2 and x < 0.75: m,n = 4,3
 	else: return a
 
-	c = [x for x in a.squad if x not in a.xi and x.status == '' and quickorder(x.tag) == m]
-
-	if len(c) == 0: return a
-
 	d = [x for x in a.xi if quickorder(x.tag) == n]
+	if n == 9: d = [x for x in a.xi if quickorder(x.tag) > 2]
 	if [x for x in d if x not in a.lastxi] != []: d = [x for x in d if x not in a.lastxi]
 	d.sort(key = lambda x: value (x, n), reverse = True)
+
+	if len(d) == 0: return a
+
+	c = [x for x in a.squad if x not in a.xi and x.status == '' and quickorder(x.tag) == m] + [d[-1]]
+	if len(c) == 0: return a
 	c.sort(key = lambda x: value (x, m), reverse = True)
 
-	if value (c[0], m) > value (d[-1], m):
+	if c[0] is not d[-1]:
 		a.xi.remove(d[-1])
 		a.xi.append(c[0])
-		#print ('balance', d[-1].name, 'out', c[0].name, 'in')
+		print ('balance', d[-1].name, 'out', c[0].name, 'in')
 		if c[0].bat > d[-1].bat and random.random() < 0.75: a = conform (a)
 	return a
 
@@ -1028,7 +1087,7 @@ def select (a, s): #team
 		a = reinforce (a, [3], 2, 1960) #add fast bowlers
 		a = reinforce (a, [2], 1, 1960) #add keeper
 		a = reinforce (a, [4], 1, 1960) #add spinner
-		if s.home in ['India',"Pakistan",'Sri Lanka',"Bangladesh","Afghanistan"]:
+		if s.home.name in ['India',"Pakistan",'Sri Lanka',"Bangladesh","Afghanistan"]:
 			a = reinforce (a, [4], 2, 1980)
 		a = reinforce (a, [0], 1, 1990) #add openers
 		a = reinforce (a, [3], 3, 1990) #add more fast bowlers
@@ -1037,6 +1096,7 @@ def select (a, s): #team
 		a = reinforce (a, [0,1,2,3,4,5,9], 11, 1960)
 
 		if random.random() < 1/4: a = reinforce (a, [0], 2, 1990)
+		if random.random() < 1/4: a = reinforce (a, [4], 2, 1990)
 		if random.random() < 1/4: a = reinforce (a, [3,4], 5, 1990)
 		if random.random() < 1/4: a = reinforce (a, [0,1,2,3,4,5,9], 12, 1960)
 
@@ -1136,7 +1196,7 @@ def longdesc (x):
 	print (x.team.ljust(13), end = ' ')
 	print (x.tag.ljust(13), end = ' ')
 	print(x.batdesc(current), end = ' ')
-	print ('     ', end = '')
+	print ('  ', end = '')
 	print(x.shortbowldesc())
 
 def testsetup (s,g):
@@ -1189,6 +1249,8 @@ def game (s, g):
 
 	t.weather = weathercheck (s, g)
 	t.pitch = pitchmake (t.weather)
+
+	PaceFactor, SpinFactor = t.pitch[0], t.pitch[1]
 
 	for i in [t.away, t.home]:
 		i = select (i, s)
@@ -1319,7 +1381,7 @@ def playseries (s):
 		if i.captain == '' or i.captain not in i.squad: i.captain = captselect (i.squad, 'asdasfasfa')
 		print (i.name, "Captain", i.captain.name)
 		if s.year < 1945: i.xi = firstxi(i)
-		i = injury(injury(i, game = False), game = False)
+		i = injury(injury(i))
 		print ()
 
 	print ()
@@ -1397,7 +1459,7 @@ def playseries (s):
 
 def switchcheck (p, t, y, a):
 	global teams
-	if p.secondteam == '' or random.random() < 1/2 or p.games == 0 or p.secondteam not in [x.name for x in a] or (p.end >= y-2 and y > 1945): pass
+	if p.secondteam == '' or random.random() < 1/2 or p.games == 0 or p.secondteam not in [x.name for x in a] or (p.end >= y-2 and y > 1918): pass
 	else:
 		print (p.name, "switches from", p.team, 'to', p.secondteam)
 		t.players.remove(p)
@@ -1405,10 +1467,9 @@ def switchcheck (p, t, y, a):
 		if p in t.xi: t.xi.remove(p)
 		if p in t.active: t.active.remove(p)
 
-		if y >= 1900:
-			p.team = p.secondteam
-			p.secondteam = ''
-		else: p.team, p.secondteam = p.secondteam, p.team
+		p.team = p.secondteam
+		p.secondteam = ''
+
 		for i in teams:
 			if i.name == p.team: i.players.append(p)
 		longdesc (p)
@@ -1505,8 +1566,8 @@ def seasonstats (p, t):
 	print ()
 	a = []
 	for i in p:
-		y = sum([x.runs for x in i.inns if x.test.year == t])
-		z = sum([x.out for x in i.inns if x.test.year == t])
+		y = sum([x.runs for x in i.inns if x.test.year == t and x.player == i])
+		z = sum([x.out for x in i.inns if x.test.year == t and x.player == i])
 		av = round(y/(max(1,z)),2)
 		if y > 0: a.append([i, y, av])
 
@@ -1523,8 +1584,8 @@ def seasonstats (p, t):
 
 		a = []
 		for i in p:
-			y = sum([x.wickets for x in i.bowls if x.test.year == t])
-			z = sum([x.runs for x in i.bowls if x.test.year == t])
+			y = sum([x.wickets for x in i.bowls if x.test.year == t and x.player == i])
+			z = sum([x.runs for x in i.bowls if x.test.year == t and x.player == i])
 			if y > 0: a.append([i, y, round(z/y,2)])
 
 		a.sort(key = lambda x: x[1], reverse = True)
@@ -1861,15 +1922,19 @@ def startup():
 
 	print ('Modes:')
 	print ('historical - player countries and time periods are unchanged')
-	print ('text - as historical, except players listed in "switch.txt" will have their countries switched.')
+	print ('text - as historical, except players listed in "switch.txt" will have their countries or date of debut switched.')
 	print ('random - player time periods are randomized, but countries are unchanged')
 	print ('shuffle - player countries are randomized, but time periods are unchanged')
+	print ('probability - as historical, except players have a probability of having their time period switched')
 	print ('chaos - player countries and time periods are both randomized')
+	print ('mild chaos - players have a probility of having their time and country changed')
+	print ('jumble - a mix of several random options')
 	print ()
 	mode = ''
-	while mode not in ['r','c','h','s', 't']: mode = input("Input: 'h' for historical, 't' for text, 'r' for random, 's' for shuffle, 'c' for chaos: ")
+	while mode not in ['r','c','h','s','t', 'p', 'm', 'j']: mode = input("Input: 'h' for historical, 't' for text, 'r' for random, 's' for shuffle, 'p' for probability, 'c' for chaos, 'm' for mild chaos, 'j' for jumble: ")
 
-	pause = input('Type "p" for pause mode. ')
+	#pause = input('Type "p" for pause mode. ')
+	pause = ''
 
 	for i in countries: x = teams.append(setup (i))
 
@@ -2012,7 +2077,7 @@ if __name__ == "__main__":
 	x = datetime.datetime.now()
 	teams, realtests, allplayers, trophies = startup()
 
-	for i in range (1877, 2021):
+	for i in range (1877, 1+datetime.datetime.now().year):
 		current = i
 		teams = season (i, teams)
 		if pause == 'p': input()
